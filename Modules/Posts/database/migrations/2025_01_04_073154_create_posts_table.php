@@ -13,7 +13,8 @@ return new class extends Migration {
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->text('title')->nullable();
+            $table->json('title')->nullable();
+            $table->json('content')->nullable();
             $table->string('slug')->unique();
             $table->enum('privacy', array_column(PostPrivacyEnum::cases(), 'value'))
                 ->default(PostPrivacyEnum::Public ->value);

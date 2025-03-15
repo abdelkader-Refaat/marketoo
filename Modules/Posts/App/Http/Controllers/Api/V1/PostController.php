@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Posts\Http\Controllers\Api\V1;
+namespace Modules\Posts\App\Http\Controllers\Api\V1;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;

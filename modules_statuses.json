@@ -1,0 +1,9 @@
+{
+    "Posts": true,
+    "Contacts": true,
+    "Customers": true,
+    "Invoices": true,
+    "Users": true,
+    "Quotes": true,
+    "Blog": true
+}

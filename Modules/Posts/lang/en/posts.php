@@ -3,14 +3,13 @@
 return [
 
     'field' => [
-        'title' => 'العنوان',
-        'content' => 'المحتوى',
+        'title' => 'Title',
+        'content' => 'Conetent',
     ],
     'model' => [
-        'single' => 'منشور',
-        'plural' => 'منشورات',
+        'single' => 'Post',
+        'plural' => 'Posts',
     ],
 
-    'no_results_message' => 'لم يتم العثور على نتائج عن البحث.',
 
 ];

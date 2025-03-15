@@ -7,7 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInitcf1e8fa32e0259a50c34905083cd09e7
 {
     public static $prefixLengthsPsr4 = array (
-        'M' => 
+        'M' =>
         array (
             'Modules\\Posts\\Database\\Seeders\\' => 31,
             'Modules\\Posts\\Database\\Factories\\' => 33,
@@ -16,29 +16,29 @@ class ComposerStaticInitcf1e8fa32e0259a50c34905083cd09e7
     );
 
     public static $prefixDirsPsr4 = array (
-        'Modules\\Posts\\Database\\Seeders\\' => 
+        'Modules\\Posts\\Database\\Seeders\\' =>
         array (
             0 => __DIR__ . '/../..' . '/database/seeders',
         ),
-        'Modules\\Posts\\Database\\Factories\\' => 
+        'Modules\\Posts\\Database\\Factories\\' =>
         array (
             0 => __DIR__ . '/../..' . '/database/factories',
         ),
-        'Modules\\Posts\\' => 
+        'Modules\\Posts\\' =>
         array (
-            0 => __DIR__ . '/../..' . '/app',
+            0 => __DIR__ . '/../..' . '/App',
         ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Modules\\Posts\\Database\\Seeders\\PostsDatabaseSeeder' => __DIR__ . '/../..' . '/database/seeders/PostsDatabaseSeeder.php',
-        'Modules\\Posts\\Enums\\PostPrivacyEnum' => __DIR__ . '/../..' . '/app/Enums/PostPrivacyEnum.php',
-        'Modules\\Posts\\Http\\Controllers\\PostsController' => __DIR__ . '/../..' . '/app/Http/Controllers/PostsController.php',
-        'Modules\\Posts\\Models\\Post' => __DIR__ . '/../..' . '/app/Models/Post.php',
-        'Modules\\Posts\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
-        'Modules\\Posts\\Providers\\PostsServiceProvider' => __DIR__ . '/../..' . '/app/Providers/PostsServiceProvider.php',
-        'Modules\\Posts\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
+        'Modules\\Posts\\Enums\\PostPrivacyEnum' => __DIR__ . '/../..' . '/App/Enums/PostPrivacyEnum.php',
+        'Modules\\Posts\\Http\\Controllers\\PostsController' => __DIR__ . '/../..' . '/App/Http/Controllers/PostsController.php',
+        'Modules\\Posts\\Models\\Post' => __DIR__ . '/../..' . '/App/Models/Post.php',
+        'Modules\\Posts\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/App/Providers/EventServiceProvider.php',
+        'Modules\\Posts\\Providers\\PostsServiceProvider' => __DIR__ . '/../..' . '/App/Providers/PostsServiceProvider.php',
+        'Modules\\Posts\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/App/Providers/RouteServiceProvider.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

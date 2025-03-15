@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Posts\Http\Controllers\Api\V1\PostController;
+use Modules\Posts\App\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +16,5 @@ use Modules\Posts\Http\Controllers\Api\V1\PostController;
 
 Route::group([], function () {
     Route::resource('posts', PostController::class)->names('posts');
+
 });
