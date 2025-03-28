@@ -2,6 +2,7 @@
 
 namespace Modules\Posts\Providers;
 
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -21,6 +22,11 @@ class PostsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'yourmodule');
+
+        Filament::serving(function () {
+            app()->setLocale(session('locale', config('app.locale')));
+        });
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();

@@ -2,6 +2,7 @@
 
 namespace Modules\Users\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -17,6 +18,15 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+        Route::middleware('web')->group(function () {
+            Route::get('/admin/switch-lang/{lang}', function ($lang, Request $request) {
+                if (in_array($lang, ['en', 'ar'])) {
+                    session(['locale' => $lang]);
+                    app()->setLocale($lang);
+                }
+                return back();
+            })->name('filament.lang.switch');
+        });
     }
 
     /**

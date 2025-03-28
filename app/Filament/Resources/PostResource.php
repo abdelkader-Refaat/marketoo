@@ -12,8 +12,6 @@ use Modules\Posts\Models\Post;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Spatie\Translatable\HasTranslations;
 
 class PostResource extends Resource
@@ -27,40 +25,40 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title.en')
-                    ->label(__('posts.field.title'))
+                TextInput::make('title')
+                    ->label(__('posts::posts.field.title'))
                     ->required(),
-                TextInput::make('title.ar')
-                    ->label(__('resources.pages.posts.label'))
-                    ->required(),
-                Textarea::make('content.en')
-                    ->label('Content (English)')
-                    ->required(),
-                Textarea::make('content.ar')
-                    ->label('Content (Arabic)')
-                    ->required(),
+                    Textarea::make('content')
+                        ->label(__('posts::posts.field.content'))
+                        ->required(),
                 Forms\Components\Select::make('privacy')
+                    ->label(__('posts::posts.post_privacy'))
                     ->options([
-                        PostPrivacyEnum::Public->value => 'Public',
-                        PostPrivacyEnum::Private->value => 'Private',
-                        PostPrivacyEnum::Unlisted->value => 'Unlisted',
+                        PostPrivacyEnum::Public->value => __('posts::posts.privacy.Public'),
+                        PostPrivacyEnum::Private->value => __('posts::posts.privacy.Private'),
+                        PostPrivacyEnum::Unlisted->value => __('posts::posts.privacy.Unlisted'),
                     ])
                     ->default(PostPrivacyEnum::Public->value)
                     ->required(),
-
-                Forms\Components\Toggle::make('is_promoted')->label('Promoted'),
-
-                Forms\Components\TextInput::make('event_name')->maxLength(50),
-                Forms\Components\DateTimePicker::make('event_date_time'),
-                Forms\Components\Textarea::make('event_description'),
-
+                Forms\Components\Toggle::make('is_promoted')
+                    ->label(__('posts::posts.Is_promoted')),
+                Forms\Components\TextInput::make('event_name')
+                    ->label(__('posts::posts.Event.name'))
+                    ->maxLength(50),
+                Forms\Components\DateTimePicker::make('event_date_time')
+                ->label(__('posts::posts.Event.date')),
+                Forms\Components\Textarea::make('event_description')
+                    ->label(__('posts::posts.Event.description')),
                 Forms\Components\Select::make('repost_id')
+                    ->label(__('posts::posts.Repost'))
                     ->relationship('repost', 'title')
                     ->nullable(),
-
-                Forms\Components\Textarea::make('repost_text')->nullable(),
+                Forms\Components\Textarea::make('repost_text')
+                    ->label(__('posts::posts.Event.description'))
+                    ->nullable(),
 
                 Forms\Components\Select::make('user_id')
+                    ->label(__('posts::posts.User'))
                     ->relationship('user', 'name')
                     ->required(),
 

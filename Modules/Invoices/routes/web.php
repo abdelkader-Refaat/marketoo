@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Invoices\Http\Controllers\InvoicesController;
-
+use Modules\Invoices\App\Http\Controllers\InvoicesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes

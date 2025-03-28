@@ -2,12 +2,12 @@
 
 namespace Modules\Users\Providers;
 
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-
 class UsersServiceProvider extends ServiceProvider
 {
     use PathNamespace;
@@ -26,6 +26,11 @@ class UsersServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
+        Filament::serving(function () {
+            Filament::registerRenderHook('global-search.end', fn () => view('vendor.filament.components.switch-language'));
+        });
+
+
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
     }
 

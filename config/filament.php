@@ -73,6 +73,10 @@ return [
 
     'cache_path' => base_path('bootstrap/cache/filament'),
 
+    'panel_providers' => [
+        App\Providers\Filament\AdminPanelProvider::class,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Livewire Loading Delay

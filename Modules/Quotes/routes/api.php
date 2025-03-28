@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Quotes\Http\Controllers\QuotesController;
+use Modules\Quotes\App\Http\Controllers\QuotesController;
 
 /*
  *--------------------------------------------------------------------------
