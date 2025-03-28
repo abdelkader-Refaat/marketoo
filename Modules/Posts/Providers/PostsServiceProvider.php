@@ -22,8 +22,6 @@ class PostsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'yourmodule');
-
         Filament::serving(function () {
             app()->setLocale(session('locale', config('app.locale')));
         });

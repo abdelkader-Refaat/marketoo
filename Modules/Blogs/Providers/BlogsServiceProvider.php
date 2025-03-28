@@ -1,32 +1,34 @@
 <?php
 
-namespace Modules\Blog\Providers;
+namespace Modules\Blogs\Providers;
 
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
-class BlogServiceProvider extends ServiceProvider
+class BlogsServiceProvider extends ServiceProvider
 {
     use PathNamespace;
-
-    protected string $name = 'Blog';
-
-    protected string $nameLower = 'blog';
-
+    protected string $name = 'Blogs';
+    protected string $nameLower = 'blogs';
     /**
      * Boot the application events.
      */
     public function boot(): void
     {
+        Filament::serving(function () {
+            app()->setLocale(session('locale', config('app.locale')));
+        });
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerTranslations();
     }
 
     /**
@@ -62,7 +64,7 @@ class BlogServiceProvider extends ServiceProvider
      */
     public function registerTranslations(): void
     {
-        $langPath = resource_path('lang/modules/'.$this->nameLower);
+        $langPath = app_path('Modules/Blogs/lang/'.$this->nameLower);
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->nameLower);

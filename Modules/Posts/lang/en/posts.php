@@ -1,14 +1,14 @@
 <?php
 
 return [
-    'name' => 'Posts',
-    'Posts' => 'Posts',
-    'title' => 'Posts Section',
+    'name' => 'Blogs',
+    'Blogs' => 'Blogs',
+    'title' => 'Blogs Section',
     'field' => [
         'title' => 'Title',
         'content' => 'Content',
     ],
-    'post_privacy' => 'Post privacy',
+    'blog_privacy' => 'Blog privacy',
     'Is_promoted' => 'Is promoted',
     'privacy' => [
         'Public' => 'Public',
@@ -17,16 +17,13 @@ return [
     ],
     'User' => 'User',
     'Repost' => 'Repost',
-
     'Event' => [
         'name' => 'Event Name',
         'date' => 'Event Date',
-        'description' =>'Event Description',
+        'description' => 'Event Description',
     ],
     'model' => [
-        'single' => 'Post',
-        'plural' => 'Posts',
+        'single' => 'Blog',
+        'plural' => 'Blogs',
     ],
-
-
 ];

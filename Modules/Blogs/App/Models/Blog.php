@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Blog\App\Models;
+namespace Modules\Blogs\App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Modules\Blog\Database\Factories\BlogFactory;
@@ -12,7 +12,7 @@ class Blog extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['title', 'content'];
+    protected $fillable = ['title','slug', 'content'];
 
     // protected static function newFactory(): BlogFactory
     // {

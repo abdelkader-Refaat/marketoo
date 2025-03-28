@@ -9,7 +9,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
-use Modules\Blog\App\Models\Blog;
+use Modules\Blogs\App\Models\Blog;
 
 
 class BlogResource extends Resource
@@ -17,8 +17,6 @@ class BlogResource extends Resource
     protected static ?string $model = Blog::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationLabel = 'Blogs';
-    protected static ?string $pluralLabel = 'Blogs';
 
     public static function form(Forms\Form $form): Forms\Form
     {
@@ -41,7 +39,6 @@ class BlogResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->sortable(),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('slug')->searchable(),
                 TextColumn::make('created_at')->dateTime(),
