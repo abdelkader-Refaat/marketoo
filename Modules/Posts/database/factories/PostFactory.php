@@ -3,7 +3,7 @@
 namespace Modules\Posts\Database\Factories;
 
 use App\Models\User;
-use Modules\Posts\Models\Post;
+use Modules\Posts\App\Models\Post;
 use Modules\Posts\Enums\PostPrivacyEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

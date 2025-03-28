@@ -8,7 +8,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Modules\Posts\Enums\PostPrivacyEnum;
-use Modules\Posts\Models\Post;
+use Modules\Posts\App\Models\Post;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;

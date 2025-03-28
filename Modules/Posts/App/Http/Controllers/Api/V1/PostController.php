@@ -4,7 +4,7 @@ namespace Modules\Posts\App\Http\Controllers\Api\V1;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
-use Modules\Posts\Models\Post;
+use Modules\Posts\App\Models\Post;
 use App\Http\Controllers\Controller;
 use Modules\Posts\Transformers\PostCollection;
 use Modules\Posts\Transformers\PostResource;

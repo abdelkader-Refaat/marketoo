@@ -2,7 +2,7 @@
 
 namespace Modules\Posts\Database\Seeders;
 
-use Modules\Posts\Models\Post;
+use Modules\Posts\App\Models\Post;
 use Illuminate\Database\Seeder;
 use Modules\Posts\Database\Factories\PostFactory;
 
