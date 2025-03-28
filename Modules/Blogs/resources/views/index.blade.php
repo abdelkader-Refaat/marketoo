@@ -3,5 +3,5 @@
 @section('content')
     <h1>Hello World</h1>
 
-    <p>Module: {!! config('blog.name') !!}</p>
+    <p>Module: {{ __('blogs::blogs.name') }}</p>
 @endsection
