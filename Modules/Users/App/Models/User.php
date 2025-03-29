@@ -1,22 +1,44 @@
 <?php
 
-namespace Modules\Users\Models;
+namespace Modules\Users\App\Models;
+use App\Models\Core\AuthBaseModel;
+use App\Models\PublicSettings\Role;
+use App\Traits\Admin\Users\RelationsTrait;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Modules\Users\Database\Factories\UserFactory;
-
-class User extends Model
+class User extends AuthBaseModel
 {
-    use HasFactory;
+    use RelationsTrait;
+    const IMAGEPATH = 'users';
 
+    protected $fillable = [
+        'name',
+        'country_code',
+        'phone',
+        'email',
+        'image',
+        'password',
+        'city_id',
+        'country_id',
+        'active',
+        'is_blocked',
+        'is_approved',
+        'lang',
+        'is_notify',
+        'code',
+        'code_expire',
+    ];
     /**
-     * The attributes that are mass assignable.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    protected $fillable = [];
+    protected function casts(): array
+    {
+        return [
+            'is_blocked'  => 'boolean',
+            'active'      => 'boolean',
+            'is_notify'   => 'boolean',
+            ];
+    }
 
-    // protected static function newFactory(): UserFactory
-    // {
-    //     // return UserFactory::new();
-    // }
 }
