@@ -2,16 +2,20 @@
 
 namespace App\Traits;
 
-trait ResponseTrait {
+use Illuminate\Http\JsonResponse;
+
+trait ResponseTrait
+{
 
     /**
      * keys : success, fail, needActive, waitingApprove, unauthenticated, blocked, exception
      */
     //todo: user builder design pattern
-    public function response($key, $msg, $data = [], $anotherKey = [], $page = false) {
+    public function response($key, $msg, $data = [], $anotherKey = [], $page = false, $code = 200)
+    {
 
-        $allResponse['key'] = (string) $key;
-        $allResponse['msg'] = (string) $msg;
+        $allResponse['key'] = (string)$key;
+        $allResponse['msg'] = (string)$msg;
 
         # unread notifications count if request ask
         if ('success' == $key && request()->has('count_notifications')) {
@@ -34,48 +38,54 @@ trait ResponseTrait {
         if ([] != $data && (in_array($key, ['success', 'needActive', 'exception']))) {
             $allResponse['data'] = $data;
         }
-        return response()->json($allResponse);
+
+        return response()->json($allResponse, $code);
     }
 
-    public function unauthenticatedReturn() {
+    public function unauthenticatedReturn()
+    {
         return $this->response('unauthenticated', trans('auth.unauthenticated'));
     }
 
-    public function unauthorizedReturn($otherData) {
+    public function unauthorizedReturn($otherData)
+    {
         return $this->response('unauthorized', trans('auth.not_authorized'), [], $otherData);
     }
 
-    public function blockedReturn($user) {
+    public function blockedReturn($user)
+    {
         $user->logout();
         return $this->response('blocked', __('auth.blocked'));
     }
-    public function providerRejected($user) {
-        $user->logout();
-        return $this->response('provider_rejected', __('auth.provider_rejected'));
-    }
 
-    public function phoneActivationReturn($user) {
+    public function phoneActivationReturn($user)
+    {
         $data = $user->sendVerificationCode();
-        return $this->response('needActive', __('auth.not_active'),$data);
+        return $this->response('needActive', __('auth.not_active'), $data);
     }
 
-    public function failMsg($msg) {
+    public function failMsg($msg)
+    {
         return $this->response('fail', $msg);
     }
 
-    public function successMsg($msg = 'done') {
+    public function successMsg($msg = 'done')
+    {
         return $this->response('success', $msg);
     }
 
-    public function successData($data) {
+    public function successData($data)
+    {
         return $this->response('success', trans('apis.success'), $data);
     }
 
-    public function successOtherData(array $dataArr) {
+    public function successOtherData(array $dataArr)
+    {
         return $this->response('success', trans('apis.success'), [], $dataArr);
     }
 
-    public function getCodeMatch($key) {
+    public function getCodeMatch($key)
+    {
 
         // $code = match($key) {
         //   'success' => 200,
@@ -91,7 +101,8 @@ trait ResponseTrait {
         // return $code;
     }
 
-    public function getCode($key) {
+    public function getCode($key)
+    {
         switch ($key) {
             case 'success':
                 $code = 200;
@@ -118,10 +129,22 @@ trait ResponseTrait {
             default:
                 $code = 200;
                 break;
-
         }
 
         return $code;
     }
 
+    public function jsonResponse(string $msg = null, int $code = 200, $data = [], bool $error = false, array $errors = [], $key = null): JsonResponse
+    {
+        return response()->json([
+            'key'    => $key ?? ($error ? 'fail' : 'success'),
+            'msg'    => $msg ?? __('apis.data_retrieved_successfully'),
+            'code'   => $code,
+            'status' => [
+                'error'             => $error,
+                'validation_errors' => $errors
+            ],
+            'data'   => empty($data) ? null : $data,
+        ], $code);
+    }
 }

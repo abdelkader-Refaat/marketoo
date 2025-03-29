@@ -7,7 +7,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 
 class RouteServiceProvider extends ServiceProvider
 {
-    protected string $name = 'Blog';
+    protected string $name = 'Blogs';
 
     /**
      * Called before routes are registered.

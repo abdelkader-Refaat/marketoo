@@ -27,6 +27,8 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+    'google_api_key' => env('GOOGLE_API_KEY', 'AIzaSyAE7JUUWTDRHTWhMGcqniqlqj5UjPYZrG8'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -65,7 +67,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+//    'timezone' => 'UTC',
+    'timezone' => 'Asia/Riyadh',
 
     /*
     |--------------------------------------------------------------------------

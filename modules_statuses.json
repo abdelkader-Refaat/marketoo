@@ -5,5 +5,7 @@
     "Invoices": true,
     "Users": true,
     "Quotes": true,
-    "Blog": true
+    "Blog": true,
+    "Admins": true,
+    "Blogs": true
 }
