@@ -12,7 +12,7 @@ class Blog extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['title','slug', 'content'];
+    protected $fillable = ['title', 'content'];
 
     // protected static function newFactory(): BlogFactory
     // {
