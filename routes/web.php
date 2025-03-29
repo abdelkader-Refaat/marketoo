@@ -4,12 +4,19 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
-use Filament\Facades\Filament;
-
+use App\Http\Controllers\Apis\Payment\PaymentController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
+Route::get('payment', function ()
+{
+    return view('payment.checkout_form');
+});
+
+Route::get('payment-success', [PaymentController::class, 'success'])->name('payment.success');
+Route::get('payment-failed', [PaymentController::class, 'failed'])->name('payment.failed');
+Route::post('payment/checkout', [PaymentController::class, 'paymentProcess'])->name('payment.process');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -26,6 +33,7 @@ Route::get('/admin/switch-lang/{locale}', function ($locale) {
     App::setLocale($locale);
     return redirect()->back();
 })->name('switch.lang');
+
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
