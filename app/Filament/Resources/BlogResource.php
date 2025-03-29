@@ -23,13 +23,11 @@ class BlogResource extends Resource
         return $form
             ->schema([
                 TextInput::make('title')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('slug')
-                    ->unique(ignoreRecord: true)
+                    ->label(__('blogs::blogs.field.title'))
                     ->required()
                     ->maxLength(255),
                 Textarea::make('content')
+                    ->label(__('blogs::blogs.field.content'))
                     ->rows(5)
                     ->required(),
             ]);
@@ -39,8 +37,8 @@ class BlogResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')->sortable(),
                 TextColumn::make('title')->searchable(),
-                TextColumn::make('slug')->searchable(),
                 TextColumn::make('created_at')->dateTime(),
             ])
             ->filters([
