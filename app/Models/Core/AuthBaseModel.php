@@ -4,7 +4,6 @@ namespace App\Models\Core;
 
 use Carbon\Carbon;
 use App\Mail\SendCode;
-use App\Models\AllUsers\Admin;
 use App\Traits\SmsTrait;
 use App\Models\Chat\Room;
 use App\Traits\UploadTrait;

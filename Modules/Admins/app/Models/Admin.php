@@ -1,6 +1,6 @@
 <?php
 
-
+namespace Modules\Admins\app\Models;
 use App\Models\Core\AuthBaseModel;
 use App\Models\PublicSettings\Role;
 
