@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
 
+
 trait ResponseTrait
 {
 
@@ -42,49 +43,49 @@ trait ResponseTrait
         return response()->json($allResponse, $code);
     }
 
-    public function unauthenticatedReturn()
+    public function unauthenticatedReturn():JsonResponse
     {
         return $this->response('unauthenticated', trans('auth.unauthenticated'));
     }
 
-    public function unauthorizedReturn($otherData)
+    public function unauthorizedReturn($otherData):JsonResponse
     {
         return $this->response('unauthorized', trans('auth.not_authorized'), [], $otherData);
     }
 
-    public function blockedReturn($user)
+    public function blockedReturn($user):JsonResponse
     {
         $user->logout();
         return $this->response('blocked', __('auth.blocked'));
     }
 
-    public function phoneActivationReturn($user)
+    public function phoneActivationReturn($user):JsonResponse
     {
         $data = $user->sendVerificationCode();
         return $this->response('needActive', __('auth.not_active'), $data);
     }
 
-    public function failMsg($msg)
+    public function failMsg($msg):JsonResponse
     {
         return $this->response('fail', $msg);
     }
 
-    public function successMsg($msg = 'done')
+    public function successMsg($msg = 'done'):JsonResponse
     {
         return $this->response('success', $msg);
     }
 
-    public function successData($data)
+    public function successData($data):JsonResponse
     {
         return $this->response('success', trans('apis.success'), $data);
     }
 
-    public function successOtherData(array $dataArr)
+    public function successOtherData(array $dataArr):JsonResponse
     {
         return $this->response('success', trans('apis.success'), [], $dataArr);
     }
 
-    public function getCodeMatch($key)
+    public function getCodeMatch($key):JsonResponse
     {
 
         // $code = match($key) {

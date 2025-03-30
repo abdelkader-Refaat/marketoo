@@ -4,8 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Enums\UserTypesEnum;
-return new class extends Migration
-{
+
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name',50)->nullable();
-            $table->string('country_code',5)->default('966');
-            $table->string('phone',15);
-            $table->string('email',50)->nullable();
+            $table->string('name', 50)->nullable();
+            $table->string('avatar', 50)->nullable();
+//            $table->string('cover', 50)->nullable();
+            $table->string('country_code', 5)->default('966');
+            $table->string('phone', 15);
+            $table->string('email', 50)->nullable();
             $table->foreignId('country_id')->nullable()->constrained('countries');
             $table->foreignId('city_id')->nullable()->constrained('cities');
-            $table->string('image', 50)->nullable();
             $table->string('password');
             $table->string('lang', 2)->default('ar');
             $table->boolean('active')->default(0);
