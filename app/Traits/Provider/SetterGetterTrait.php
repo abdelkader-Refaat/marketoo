@@ -7,8 +7,9 @@ trait SetterGetterTrait
     public function setCommercialRegisterFileAttribute($value)
     {
         if (null != $value && is_file($value)) {
-            isset($this->attributes['commercial_register_file']) ? $this->deleteFile($this->attributes['commercial_register_file'], static::IMAGEPATH) : '';
-            $this->attributes['commercial_register_file'] = $this->uploadAllTyps($value, static::IMAGEPATH);
+            isset($this->attributes['commercial_register_file']) ? $this->deleteFile($this->attributes['commercial_register_file'],
+                static::IMAGEPATH) : '';
+            $this->attributes['commercial_register_file'] = $this->uploadAllTypes($value, static::IMAGEPATH);
         }
     }
 
@@ -25,8 +26,9 @@ trait SetterGetterTrait
     public function setCertificatesFileAttribute($value)
     {
         if (null != $value && is_file($value)) {
-            isset($this->attributes['certificates_file']) ? $this->deleteFile($this->attributes['certificates_file'], static::IMAGEPATH) : '';
-            $this->attributes['certificates_file'] = $this->uploadAllTyps($value, static::IMAGEPATH);
+            isset($this->attributes['certificates_file']) ? $this->deleteFile($this->attributes['certificates_file'],
+                static::IMAGEPATH) : '';
+            $this->attributes['certificates_file'] = $this->uploadAllTypes($value, static::IMAGEPATH);
         }
     }
 
@@ -43,10 +45,12 @@ trait SetterGetterTrait
     public function setAddressFileAttribute($value)
     {
         if (null != $value && is_file($value)) {
-            isset($this->attributes['address_file']) ? $this->deleteFile($this->attributes['address_file'], static::IMAGEPATH) : '';
-            $this->attributes['address_file'] = $this->uploadAllTyps($value, static::IMAGEPATH);
+            isset($this->attributes['address_file']) ? $this->deleteFile($this->attributes['address_file'],
+                static::IMAGEPATH) : '';
+            $this->attributes['address_file'] = $this->uploadAllTypes($value, static::IMAGEPATH);
         }
     }
+
     public function getAddressFileAttribute()
     {
         if ($this->attributes['address_file']) {

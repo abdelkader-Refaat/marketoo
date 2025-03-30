@@ -36,8 +36,9 @@ class BankAccount extends BaseModel
     public function setBankAccountImageAttribute($value): void
     {
         if (null != $value && is_file($value)) {
-            isset($this->attributes['bank_account_image']) ? $this->deleteFile($this->attributes['bank_account_image'], self::IMAGEPATH) : '';
-            $this->attributes['bank_account_image'] = $this->uploadAllTyps($value, self::IMAGEPATH);
+            isset($this->attributes['bank_account_image']) ? $this->deleteFile($this->attributes['bank_account_image'],
+                self::IMAGEPATH) : '';
+            $this->attributes['bank_account_image'] = $this->uploadAllTypes($value, self::IMAGEPATH);
         }
     }
 

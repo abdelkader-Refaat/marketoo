@@ -12,6 +12,7 @@ use App\Models\Chat\RoomMember;
 use App\Models\Core\AuthUpdate;
 use App\Services\Sms\SmsService;
 use App\Models\Core\Notification;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PublicSettings\Device;
@@ -34,9 +35,11 @@ class AuthBaseModel extends Authenticatable
     {
         parent::boot();
         /* creating, created, updating, updated, deleting, deleted, forceDeleted, restored */
-
         static::deleted(function ($model) {
-            $model->deleteFile($model->attributes['image'], self::IMAGEPATH);
+            $field = $model->getAvatarField();
+            if (!empty($model->attributes[$field])) {
+                $model->deleteFile($model->attributes[$field], self::IMAGEPATH);
+            }
         });
 
         // static::created(function ($model) {
@@ -44,6 +47,14 @@ class AuthBaseModel extends Authenticatable
         //         $model->wallet()->create();
         //     }
         // });
+    }
+
+    protected function getAvatarField(): string
+    {
+        if (Schema::hasColumn($this->getTable(), 'avatar')) {
+            return 'avatar';
+        }
+        return 'image';
     }
 
     public function scopeSearch($query, $searchArray = [])
@@ -95,21 +106,20 @@ class AuthBaseModel extends Authenticatable
         return $this->attributes['country_code'].$this->attributes['phone'];
     }
 
-    public function getImageAttribute()
+    public function getAvatarAttribute()
     {
-        if ($this->attributes['image']) {
-            $image = $this->getImage($this->attributes['image'], static::IMAGEPATH);
-        } else {
-            $image = $this->defaultImage('users');
-        }
-        return $image;
+        $field = $this->getAvatarField();
+        return $this->getImage($this->attributes[$field], static::IMAGEPATH);
     }
 
-    public function setImageAttribute($value)
+    public function setAvatarAttribute($value)
     {
+        $field = $this->getAvatarField();
         if (null != $value && is_file($value)) {
-            isset($this->attributes['image']) ? $this->deleteFile($this->attributes['image'], static::IMAGEPATH) : '';
-            $this->attributes['image'] = $this->uploadAllTyps($value, static::IMAGEPATH);
+            if (isset($this->attributes[$field])) {
+                $this->deleteFile($this->attributes[$field], static::IMAGEPATH);
+            }
+            $this->attributes[$field] = $this->uploadAllTypes($value, static::IMAGEPATH);
         }
     }
 
@@ -159,7 +169,6 @@ class AuthBaseModel extends Authenticatable
         // $this->tokens()->delete();
         $this->updateDevice();
         $this->updateLang();
-
         if (!$this['parent_id']) {
             $token = $this->createToken(request()->device_type)->plainTextToken;
         } else {

@@ -3,7 +3,7 @@
 namespace Modules\Users\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use Modules\Users\App\Models\User;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller

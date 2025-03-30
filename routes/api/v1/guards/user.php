@@ -4,7 +4,7 @@ use app\Http\Controllers\Api\V1\User\Individual\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['guest:sanctum'], 'controller' => AuthController::class], function () {
-    Route::post('register', [AuthController::class, 'register'])->name('register');
+    Route::post('register', 'register')->name('register');
     Route::post('login', 'login');
     Route::post('resend-code', 'resendCode');
     Route::post('check-code', 'activate');

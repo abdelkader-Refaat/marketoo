@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Blog\App\Http\Controllers\BlogController;
+use Modules\Blogs\App\Http\Controllers\BlogController;
+
 /*
  *--------------------------------------------------------------------------
  * API Routes
