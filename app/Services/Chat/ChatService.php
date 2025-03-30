@@ -17,7 +17,7 @@ class ChatService
     public function createRoom($creator, $type, $order_id = null)
     {
         $newRoom = $creator->ownRooms()->firstOrCreate([
-            'type'     => $type,
+            'type' => $type,
             'order_id' => $order_id,
         ]);
 
@@ -25,6 +25,12 @@ class ChatService
         $this->joinRoom($newRoom, Admin::first());
 
         return $newRoom;
+    }
+
+    public function joinRoom($room, $member)
+    {
+        /** join room in room_members table */
+        $member->rooms()->firstOrCreate(['room_id' => $room->id]);
     }
 
     public function createPrivateRoom($creator, $type, $memberable, $order = null)
@@ -54,7 +60,7 @@ class ChatService
         } else {
             // create new room
             $room = $creator->ownRooms()->create([
-                'type'    => $type,
+                'type' => $type,
                 'private' => 1,
                 'order_id' => $order->id
             ]);
@@ -69,18 +75,12 @@ class ChatService
     public function createPrivateRoomForNegotiationOrder($creator, $type, $memberable)
     {
         $room = $creator->ownRooms()->create([
-            'type'    => $type,
+            'type' => $type,
             'private' => 1
         ]);
         $this->joinRoom($room, $creator);
         $this->joinRoom($room, $memberable);
         return $room;
-    }
-
-    public function joinRoom($room, $member)
-    {
-        /** join room in room_members table */
-        $member->rooms()->firstOrCreate(['room_id' => $room->id]);
     }
 
     public function leaveRoom($room, $member)
@@ -114,6 +114,11 @@ class ChatService
             ->paginate($this->chatPaginateNum());
 
         return $roomMessagesQuery;
+    }
+
+    public function chatPaginateNum()
+    {
+        return request()->paginate ?? 100;
     }
 
     public function getRoomMessagesResource($room, $userable)
@@ -151,11 +156,6 @@ class ChatService
         return $rooms;
     }
 
-    public function chatPaginateNum()
-    {
-        return request()->paginate ?? 100;
-    }
-
     public function getRoomUnseenMessagesCount($room, $userable)
     {
         $count = $room->Messages()
@@ -181,14 +181,15 @@ class ChatService
     public function storeMessage($room, $sender, $message)
     {
         if (getType($message) == 'string') {
-            if (getType(json_decode($message, true)) == 'array')
+            if (getType(json_decode($message, true)) == 'array') {
                 $type = 'invoice';
-            else
+            } else {
                 $type = 'text';
+            }
             $body = $message;
         } else {
             $type = 'file';
-            $body = $this->uploadAllTyps($message, 'rooms/' . $room->id);
+            $body = $this->uploadAllTypes($message, 'rooms/'.$room->id);
         }
 
         //TODO: make shorter
@@ -207,7 +208,6 @@ class ChatService
 
         // create message relation for every room member
         foreach ($room->members->pluck('memberable') as $member) {
-
             $newMessageNoti = new MessageNotification;
             $newMessageNoti->message_id = $newMessage->id;
             $newMessageNoti->room_id = $room->id;
@@ -241,9 +241,8 @@ class ChatService
 
     public function uploadRoomFile($room, $sender, $file)
     {
-
-        $file_name = $this->uploadAllTyps($file, 'rooms/' . $room->id);
-        $file_url = $this->getImage($file_name, 'rooms/' . $room->id);
+        $file_name = $this->uploadAllTypes($file, 'rooms/'.$room->id);
+        $file_url = $this->getImage($file_name, 'rooms/'.$room->id);
         return ['file_name' => $file_name, 'file_url' => $file_url];
     }
 

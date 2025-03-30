@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models\PublicSettings;
+
 use App\Models\Core\BaseModel;
 use App\Traits\UploadTrait;
 
@@ -8,8 +9,8 @@ class Social extends BaseModel
 {
     use UploadTrait;
 
-    const IMAGEPATH = 'socials' ;
-    protected $fillable = ['link' , 'icon' , 'name'];
+    const IMAGEPATH = 'socials';
+    protected $fillable = ['link', 'icon', 'name'];
 
     public function getIconAttribute()
     {
@@ -21,10 +22,11 @@ class Social extends BaseModel
         return $image;
     }
 
-    public function setIconAttribute($value) {
-        if (null != $value && is_file($value) ) {
-            isset($this->attributes['icon']) ? $this->deleteFile($this->attributes['icon'] , static::IMAGEPATH) : '';
-            $this->attributes['icon'] = $this->uploadAllTyps($value, static::IMAGEPATH);
+    public function setIconAttribute($value)
+    {
+        if (null != $value && is_file($value)) {
+            isset($this->attributes['icon']) ? $this->deleteFile($this->attributes['icon'], static::IMAGEPATH) : '';
+            $this->attributes['icon'] = $this->uploadAllTypes($value, static::IMAGEPATH);
         }
     }
 

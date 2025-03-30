@@ -66,7 +66,7 @@ class BaseModel extends Model
     {
         if (null != $value && is_file($value)) {
             isset($this->attributes['image']) ? $this->deleteFile($this->attributes['image'], static::IMAGEPATH) : '';
-            $this->attributes['image'] = $this->uploadAllTyps($value, static::IMAGEPATH);
+            $this->attributes['image'] = $this->uploadAllTypes($value, static::IMAGEPATH);
         }
     }
 

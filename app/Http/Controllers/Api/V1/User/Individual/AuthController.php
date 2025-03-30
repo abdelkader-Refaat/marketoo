@@ -3,10 +3,10 @@
 namespace app\Http\Controllers\Api\V1\User\Individual;
 
 use App\Http\Controllers\Controller;
-use app\Http\Requests\Api\V1\User\Individual\ActivateRequest;
-use app\Http\Requests\Api\V1\User\Individual\LoginRequest;
-use app\Http\Requests\Api\V1\User\Individual\RegisterRequest;
-use app\Http\Requests\Api\V1\User\Individual\ResendCodeRequest;
+use App\Http\Requests\Api\V1\User\Individual\ActivateRequest;
+use App\Http\Requests\Api\V1\User\Individual\LoginRequest;
+use App\Http\Requests\Api\V1\User\Individual\RegisterRequest;
+use App\Http\Requests\Api\V1\User\Individual\ResendCodeRequest;
 use App\Http\Resources\Api\User\UserResource;
 use App\Http\Resources\RegisterResource;
 use App\Services\AllUsers\ClientService;
@@ -30,17 +30,6 @@ class AuthController extends Controller
         $this->userService = new ClientService();
     }
 
-        public function register(RegisterRequest $request)
-        {
-            try {
-                $user = User::create($request->validated());
-                $token = $user->createToken('auth_token')->plainTextToken;
-                return response()->json(RegisterResource::make($user, $token), 201)->header('Authorization', "Bearer {$token}");
-            }catch(\Exception $exception){
-                return response()->json(['error'=>$exception->getMessage()]);
-            }
-        }
-
     public function login(LoginRequest $request): JsonResponse
     {
         try {
@@ -48,7 +37,9 @@ class AuthController extends Controller
             $data = $this->authService->loginViaPhone($data);
             return $this->jsonResponse(msg: $data['msg'], data: $data['data'] ?? [], key: $data['key']);
         } catch (\Exception $e) {
-            return $this->jsonResponse(msg: $e->getMessage(), code: 500, error: true, errors: ['file' => $e->getFile(), 'line' => $e->getLine()]);
+            return $this->jsonResponse(msg: $e->getMessage(), code: 500, error: true, errors: [
+                'file' => $e->getFile(), 'line' => $e->getLine()
+            ]);
         }
     }
 
@@ -60,12 +51,13 @@ class AuthController extends Controller
             $go_to_register_step = $this->userService->isRegistered($data['data']['user']);
             DB::commit();
             return $this->jsonResponse(msg: $data['msg'], data: [
-                'user'                => UserResource::make($data['data']['user'])->setToken($data['data']['token']),
+                'user' => UserResource::make($data['data']['user'])->setToken($data['data']['token']),
                 'go_to_register_step' => $go_to_register_step
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->jsonResponse(msg: $e->getMessage(), code: $e->getCode(), error: true, errors: ['file' => $e->getFile(), 'line' => $e->getLine()]);
+            return $this->jsonResponse(msg: $e->getMessage(), code: $e->getCode(), error: true,
+                errors: ['file' => $e->getFile(), 'line' => $e->getLine()]);
         }
     }
 
@@ -75,6 +67,18 @@ class AuthController extends Controller
         return $this->jsonResponse(msg: $data['msg'], data: [
             'user' => UserResource::make($data['user'])->setToken($request->headers->get('Authorization'))
         ]);
+    }
+
+    public function register(RegisterRequest $request)
+    {
+        try {
+            $user = User::query()->create($request->validated());
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return $this->successData(RegisterResource::make($user, $token), 201)->header('Authorization',
+                "Bearer {$token}");
+        } catch (\Exception $exception) {
+            return $this->failMsg($exception->getMessage());
+        }
     }
 
     public function resendCode(ResendCodeRequest $request): JsonResponse
