@@ -1,12 +1,16 @@
 <?php
 
+namespace Modules\Admins\App\Models;
 
 use App\Models\Core\AuthBaseModel;
 use App\Models\PublicSettings\Role;
 
-class Admin extends AuthBaseModel {
+class Admin extends AuthBaseModel
+{
 
     const IMAGEPATH = 'admins';
+    const FILEPATH = 'admins';
+    const FILES = ['avatar'];
 
     protected $fillable = [
         'name',
@@ -21,19 +25,24 @@ class Admin extends AuthBaseModel {
         'type',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected static function newFactory()
+    {
+        return \Modules\Admins\Database\Factories\AdminFactory::new();
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class)->withTrashed();
+    }
+
     protected function casts(): array
     {
         return [
-            'is_notify'  => 'boolean',
-            'is_blocked' => 'boolean',        ];
+            'is_notify' => 'boolean',
+            'is_blocked' => 'boolean',
+            'password' => 'hashed',
+        ];
     }
 
-    public function role() {
-        return $this->belongsTo(Role::class)->withTrashed();
-    }
+
 }

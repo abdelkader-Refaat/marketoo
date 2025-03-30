@@ -1,10 +1,10 @@
 <?php
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Session;
+
 use Illuminate\Support\Facades\App;
-use App\Http\Controllers\Apis\Payment\PaymentController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Inertia\Inertia;
+use app\Http\Controllers\Apis\V1\Payment\PaymentController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');

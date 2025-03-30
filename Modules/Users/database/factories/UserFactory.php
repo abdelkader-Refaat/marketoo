@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Users\Database\Factories;
-
-use Illuminate\Database\Eloquent\Factories\Factory;
+namespace Modules\Users\database\factories;
 use Illuminate\Support\Facades\Hash;
-use Modules\Users\Models\User;
+use Modules\Users\App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
 
 class UserFactory extends Factory
 {

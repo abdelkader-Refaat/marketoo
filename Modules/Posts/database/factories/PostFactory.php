@@ -2,17 +2,16 @@
 
 namespace Modules\Posts\Database\Factories;
 
-use App\Models\User;
-use Modules\Posts\App\Models\Post;
-use Modules\Posts\Enums\PostPrivacyEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Posts\Enums\PostPrivacyEnum;
+use Modules\Users\App\Models\User;
 
 class PostFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = Post::class;
+    protected $model = \Modules\Posts\App\Models\Post::class;
 
     /**
      * Define the model's default state.
@@ -20,21 +19,16 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'user_id' => User::inRandomOrder()->first()?->id ??User::factory(),
             'title' => $this->faker->sentence,
             'slug' => $this->faker->unique()->slug,
             'privacy' => $this->faker->randomElement(array_column(PostPrivacyEnum::cases(), 'value')),
             'is_promoted' => $this->faker->boolean,
-
-            // Event fields
             'event_name' => $this->faker->optional()->words(3, true),
             'event_date_time' => $this->faker->optional()->dateTimeBetween('now', '+1 year'),
             'event_description' => $this->faker->optional()->paragraph,
-
-            // Repost fields
-            'repost_id' => null, // This can be handled later for nested reposts
+            'repost_id' => null,
             'repost_text' => $this->faker->optional()->text,
-
             'created_at' => now(),
             'updated_at' => now(),
         ];

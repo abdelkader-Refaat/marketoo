@@ -4,7 +4,6 @@ namespace App\Models\Core;
 
 use Carbon\Carbon;
 use App\Mail\SendCode;
-use App\Models\AllUsers\Admin;
 use App\Traits\SmsTrait;
 use App\Models\Chat\Room;
 use App\Traits\UploadTrait;
@@ -31,6 +30,21 @@ class AuthBaseModel extends Authenticatable
 
     const IMAGEPATH = 'users';
 
+    public static function boot()
+    {
+        parent::boot();
+        /* creating, created, updating, updated, deleting, deleted, forceDeleted, restored */
+
+        static::deleted(function ($model) {
+            $model->deleteFile($model->attributes['image'], self::IMAGEPATH);
+        });
+
+        // static::created(function ($model) {
+        //     if (get_class($model) != Admin::class) {
+        //         $model->wallet()->create();
+        //     }
+        // });
+    }
 
     public function scopeSearch($query, $searchArray = [])
     {
@@ -52,13 +66,14 @@ class AuthBaseModel extends Authenticatable
                         }
                     } else {
                         if (null != $value) {
-                            $query->Where($key, 'like', '%' . $value . '%');
+                            $query->Where($key, 'like', '%'.$value.'%');
                         }
                     }
                 }
             }
         });
-        return $query->orderBy('id', request()->searchArray && request()->searchArray['order'] ? request()->searchArray['order'] : 'DESC');
+        return $query->orderBy('id',
+            request()->searchArray && request()->searchArray['order'] ? request()->searchArray['order'] : 'DESC');
     }
 
     public function setPhoneAttribute($value)
@@ -77,7 +92,7 @@ class AuthBaseModel extends Authenticatable
 
     public function getFullPhoneAttribute()
     {
-        return $this->attributes['country_code'] . $this->attributes['phone'];
+        return $this->attributes['country_code'].$this->attributes['phone'];
     }
 
     public function getImageAttribute()
@@ -90,19 +105,11 @@ class AuthBaseModel extends Authenticatable
         return $image;
     }
 
-
     public function setImageAttribute($value)
     {
         if (null != $value && is_file($value)) {
             isset($this->attributes['image']) ? $this->deleteFile($this->attributes['image'], static::IMAGEPATH) : '';
             $this->attributes['image'] = $this->uploadAllTyps($value, static::IMAGEPATH);
-        }
-    }
-
-    public function setPasswordAttribute($value)
-    {
-        if ($value) {
-            $this->attributes['password'] = bcrypt($value);
         }
     }
 
@@ -120,7 +127,7 @@ class AuthBaseModel extends Authenticatable
     public function sendVerificationCode(): array
     {
         $this->update([
-            'code'        => $this->activationCode(),
+            'code' => $this->activationCode(),
             'code_expire' => Carbon::now()->addMinute(),
         ]);
         $this->sendCodeAtSms($this->code);
@@ -135,7 +142,7 @@ class AuthBaseModel extends Authenticatable
 
     public function sendCodeAtSms($code, $full_phone = null): void
     {
-        (new SmsService())->sendSms($full_phone ?? $this->full_phone, trans('api.activeCode') . $code);
+        (new SmsService())->sendSms($full_phone ?? $this->full_phone, trans('api.activeCode').$code);
     }
 
     public function sendCodeAtEmail($code, $email = null): void
@@ -143,13 +150,8 @@ class AuthBaseModel extends Authenticatable
         try {
             Mail::to($email ?? $this->email)->send(new SendCode($code, $this->name));
         } catch (\Exception $e) {
-            info('Failed to send email: ' . $e->getMessage());
+            info('Failed to send email: '.$e->getMessage());
         }
-    }
-
-    public function devices()
-    {
-        return $this->morphMany(Device::class, 'morph');
     }
 
     public function login()
@@ -167,11 +169,19 @@ class AuthBaseModel extends Authenticatable
         return $token;
     }
 
-    public function getAbilitiesAndSetTokenAbility($provider,  $device_type)
+    public function updateDevice()
     {
-        $ProviderAbilities = $provider->abilities()->pluck('value')->toArray();
+        if (request()->device_id) {
+            $this->devices()->updateOrCreate([
+                'device_id' => request()->device_id,
+                'device_type' => request()->device_type,
+            ]);
+        }
+    }
 
-        return $provider->createToken($device_type, $ProviderAbilities)->plainTextToken;
+    public function devices()
+    {
+        return $this->morphMany(Device::class, 'morph');
     }
 
     public function updateLang()
@@ -186,16 +196,12 @@ class AuthBaseModel extends Authenticatable
         }
     }
 
-    public function updateDevice()
+    public function getAbilitiesAndSetTokenAbility($provider, $device_type)
     {
-        if (request()->device_id) {
-            $this->devices()->updateOrCreate([
-                'device_id'   => request()->device_id,
-                'device_type' => request()->device_type,
-            ]);
-        }
-    }
+        $ProviderAbilities = $provider->abilities()->pluck('value')->toArray();
 
+        return $provider->createToken($device_type, $ProviderAbilities)->plainTextToken;
+    }
 
     public function logout()
     {
@@ -206,7 +212,6 @@ class AuthBaseModel extends Authenticatable
         }
         return true;
     }
-
 
     public function rooms()
     {
@@ -245,22 +250,5 @@ class AuthBaseModel extends Authenticatable
     public function complaints(): MorphMany
     {
         return $this->morphMany(Complaint::class, 'complaintable');
-    }
-
-
-    public static function boot()
-    {
-        parent::boot();
-        /* creating, created, updating, updated, deleting, deleted, forceDeleted, restored */
-
-        static::deleted(function ($model) {
-            $model->deleteFile($model->attributes['image'], self::IMAGEPATH);
-        });
-
-        // static::created(function ($model) {
-        //     if (get_class($model) != Admin::class) {
-        //         $model->wallet()->create();
-        //     }
-        // });
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\Users\App\Models;
+
 use App\Models\Core\AuthBaseModel;
 use App\Models\PublicSettings\Role;
 use App\Traits\Admin\Users\RelationsTrait;
@@ -8,14 +9,17 @@ use App\Traits\Admin\Users\RelationsTrait;
 class User extends AuthBaseModel
 {
     use RelationsTrait;
+
     const IMAGEPATH = 'users';
+    const FILES = ['avatar'];
+    const FILEPATH = 'users';
 
     protected $fillable = [
         'name',
+        'avatar',
         'country_code',
         'phone',
         'email',
-        'image',
         'password',
         'city_id',
         'country_id',
@@ -27,18 +31,16 @@ class User extends AuthBaseModel
         'code',
         'code_expire',
     ];
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+
+
     protected function casts(): array
     {
         return [
-            'is_blocked'  => 'boolean',
-            'active'      => 'boolean',
-            'is_notify'   => 'boolean',
-            ];
+            'is_blocked' => 'boolean',
+            'active' => 'boolean',
+            'is_notify' => 'boolean',
+            'password' => 'hashed'
+        ];
     }
 
 }
