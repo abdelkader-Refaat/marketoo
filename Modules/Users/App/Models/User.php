@@ -29,6 +29,7 @@ class User extends AuthBaseModel
         'lang',
         'is_notify',
         'code',
+        'type',
         'code_expire',
     ];
 
@@ -39,7 +40,9 @@ class User extends AuthBaseModel
             'is_blocked' => 'boolean',
             'active' => 'boolean',
             'is_notify' => 'boolean',
+            'type' => 'integer',
             'password' => 'hashed'
+
         ];
     }
 

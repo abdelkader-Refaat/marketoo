@@ -31,7 +31,7 @@ class RegisterResource extends JsonResource
             'is_active' => (boolean) $this->is_active,
             'is_blocked' => (boolean) $this->is_blocked,
             'is_approved' => (boolean) $this->is_approved,
-            'type' => strtolower(UserTypesEnum::tryFrom($this->type)?->name ?? 'unknown'),
+            'type' => strtolower(UserTypesEnum::tryFrom($this->type)?->name),
             'token' => $this->token,
 //            'type' => $this->
         ];

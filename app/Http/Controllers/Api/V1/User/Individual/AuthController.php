@@ -74,7 +74,7 @@ class AuthController extends Controller
         try {
             $user = User::query()->create($request->validated());
             $token = $user->createToken('auth_token')->plainTextToken;
-            return $this->successData(RegisterResource::make($user, $token), 201)->header('Authorization',
+            return $this->successData(RegisterResource::make($user->fresh(), $token), 201)->header('Authorization',
                 "Bearer {$token}");
         } catch (\Exception $exception) {
             return $this->failMsg($exception->getMessage());
