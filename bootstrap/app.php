@@ -15,14 +15,36 @@ use Illuminate\Support\Facades\Route;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: [
-            __DIR__.'/../routes/auth.php',    // Auth routes
-            __DIR__.'/../routes/settings.php', // Settings routes
-            __DIR__.'/../routes/web.php',      // Main web routes
-            __DIR__.'/../routes/site.php'     // Site routes
+//            __DIR__.'/../routes/auth.php',    // Auth routes
+//            __DIR__.'/../routes/settings.php', // Settings routes
+//            __DIR__.'/../routes/web.php',      // Main web routes
+//            __DIR__.'/../routes/site.php'     // Site routes
         ],
-        commands: __DIR__ . '/../routes/console.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
+            // Admin Web Routes Group
+            // Admin Routes - Each with its own prefix and name
+            Route::middleware('web')->group(function () {
+                // Auth routes - /admin/auth
+                Route::prefix('admin/auth')
+                    ->name('admin.auth.')
+                    ->group(base_path('routes/admin/auth.php'));
+
+                // Settings routes - /admin/settings
+                Route::prefix('admin/settings')
+                    ->name('admin.settings.')
+                    ->group(base_path('routes/admin/settings.php'));
+
+                // Main web routes - /admin
+                Route::name('admin.')
+                    ->group(base_path('routes/web.php'));
+
+                // Site routes - /admin/site
+                Route::prefix('admin/site')
+                    ->name('admin.site.')
+                    ->group(base_path('routes/admin/site.php'));
+            });
             // API Version 1 routes
             Route::middleware('api')
                 ->prefix('api/v1')

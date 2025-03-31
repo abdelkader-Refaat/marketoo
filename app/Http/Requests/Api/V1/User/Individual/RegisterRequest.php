@@ -4,6 +4,7 @@ namespace App\Http\Requests\Api\V1\User\Individual;
 
 use App\Http\Requests\Api\V1\BaseApiRequest;
 use Illuminate\Validation\Rule;
+use Modules\Users\App\Models\User;
 
 class RegisterRequest extends BaseApiRequest
 {
@@ -14,8 +15,7 @@ class RegisterRequest extends BaseApiRequest
             'name' => ['required', 'max:50'],
             'avatar' => 'nullable|mimes:'.$this->mimesImage(),
             'phone' => [
-                'required',
-                'numeric',
+                'required', 'numeric',
                 Rule::unique('users', 'phone')
                     ->whereNull('deleted_at'),
             ],
