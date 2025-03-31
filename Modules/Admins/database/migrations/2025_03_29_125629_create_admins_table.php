@@ -19,8 +19,9 @@ return new class extends Migration {
             $table->string('country_code', 5)->nullable();
             $table->string('phone')->nullable();
             $table->string('password');
+            $table->rememberToken()->nullable();
             $table->integer('role_id')->nullable();
-            $table->boolean('is_blocked')->default(0);
+            $table->boolean('is_blocked')->default(false);
             $table->boolean('is_notify')->default(true);
             $table->softDeletes();
             $table->timestamps();

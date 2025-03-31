@@ -51,15 +51,20 @@ return [
             'provider' => 'users',
         ],
 
+        'filament' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+
 //        'provider' => [
 //            'driver'  => 'sanctum',
 //            'provider' => 'providers',
 //        ],
 
-        'admin' => [
-            'driver' => 'session',
-            'provider' => 'admins',
-        ],
+//        'admin' => [
+//            'driver' => 'session',
+//            'provider' => 'admins',
+//        ],
     ],
 
     /*
@@ -83,6 +88,7 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', \Modules\Users\App\Models\User::class),
         ],
+
 
         'admins' => [
             'driver' => 'eloquent',

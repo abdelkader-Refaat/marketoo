@@ -17,6 +17,7 @@ use Spatie\Translatable\HasTranslations;
 class PostResource extends Resource
 {
     use HasTranslations;
+
     protected static ?string $model = Post::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -28,9 +29,9 @@ class PostResource extends Resource
                 TextInput::make('title')
                     ->label(__('posts::posts.field.title'))
                     ->required(),
-                    Textarea::make('content')
-                        ->label(__('posts::posts.field.content'))
-                        ->required(),
+                Textarea::make('content')
+                    ->label(__('posts::posts.field.content'))
+                    ->required(),
                 Forms\Components\Select::make('privacy')
                     ->label(__('posts::posts.post_privacy'))
                     ->options([
@@ -46,7 +47,7 @@ class PostResource extends Resource
                     ->label(__('posts::posts.Event.name'))
                     ->maxLength(50),
                 Forms\Components\DateTimePicker::make('event_date_time')
-                ->label(__('posts::posts.Event.date')),
+                    ->label(__('posts::posts.Event.date')),
                 Forms\Components\Textarea::make('event_description')
                     ->label(__('posts::posts.Event.description')),
                 Forms\Components\Select::make('repost_id')
@@ -85,6 +86,7 @@ class PostResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -98,6 +100,7 @@ class PostResource extends Resource
         return [
         ];
     }
+
     public static function getPages(): array
     {
         return [

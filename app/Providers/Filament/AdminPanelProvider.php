@@ -17,10 +17,12 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Facades\Filament;
 use Filament\Navigation\UserMenuItem;
 use Illuminate\Support\Facades\App;
+
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -29,7 +31,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login()  // This is enough for authentication
+            ->authGuard('filament') // Ensure Filament uses the `filament` guard
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -42,8 +45,6 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
-//                LanguageSwitcher::class,
-
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -60,6 +61,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
     public function boot(): void
     {
         Filament::serving(function () {
@@ -68,7 +70,6 @@ class AdminPanelProvider extends PanelProvider
                 UserMenuItem::make()
                     ->label('🇺🇸 English')
                     ->url(url('/admin/switch-lang/en')),
-
                 UserMenuItem::make()
                     ->label('🇸🇦 العربية')
                     ->url(url('/admin/switch-lang/ar')),

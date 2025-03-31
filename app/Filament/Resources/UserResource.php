@@ -14,7 +14,6 @@ use Modules\Users\App\Models\User;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function form(Form $form): Form
@@ -22,14 +21,16 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label(__('users.field.name'))
-                    ->required(),
+                    ->label(__('users.field.name')),
 
                 Forms\Components\TextInput::make('email')
                     ->label(__('users.field.email'))
                     ->email()
-                    ->required()
                     ->unique(User::class, 'email'),
+
+                Forms\Components\TextInput::make('phone')
+                    ->label(__('users.field.phone'))
+                    ->required(),
 
                 Forms\Components\TextInput::make('password')
                     ->label(__('users.field.password'))
@@ -38,9 +39,8 @@ class UserResource extends Resource
                     ->dehydrateStateUsing(fn($state) => Hash::make($state))
                     ->maxLength(255),
 
-                Forms\Components\Toggle::make('is_admin')
-                    ->label(__('users.field.is_admin'))
-                    ->default(false),
+                Forms\Components\Toggle::make('active')
+                    ->label(__('users.field.active')),
             ]);
     }
 
@@ -50,16 +50,17 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
-                Tables\Columns\BooleanColumn::make('is_admin')
-                    ->label(__('users.field.is_admin')),
+                Tables\Columns\TextColumn::make('phone')->sortable()->searchable(),
+                Tables\Columns\BooleanColumn::make('active')
+                    ->label(__('users.field.active')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->dateTime(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('is_admin')
-                    ->query(fn($query) => $query->where('is_admin', true))
-                    ->label(__('users.filters.admins')),
+                Tables\Filters\Filter::make('active')
+                    ->query(fn($query) => $query->where('active', true))
+                    ->label(__('users.filters.active')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

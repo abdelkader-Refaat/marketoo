@@ -17,14 +17,18 @@ class AdminFactory extends Factory
      */
     public function definition(): array
     {
-        $faker = \Faker\Factory::create('ar_SA');
-        $saudiArabiaNums = $faker->unique()->numberBetween(500000000, 599999999);
         return [
-            'name' => $faker->name,
-            'email' => $faker->unique()->safeEmail,
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
             'country_code' => '966',
-            'phone' => $saudiArabiaNums,
-            'password' => 123456,
+            'phone' => $this->faker->unique()->numberBetween(500000000, 599999999),
+            'password' => bcrypt('password'), // Always use bcrypt
+            'type' => $this->faker->randomElement(['admin', 'super_admin']),
+//            'avatar' => null,
+//            'is_blocked' => false,
+//            'is_notify' => true,
+//            'role_id' => null,
+            'remember_token' => null,
         ];
     }
 }

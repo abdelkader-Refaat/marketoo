@@ -11,31 +11,54 @@ use Illuminate\Support\ServiceProvider;
 
 class FilamentServiceProvider extends ServiceProvider
 {
-    public function panel(Panel $panel): Panel
-    {
-        return $panel
-            ->navigationItems([
-                NavigationItem::make('English')
-                    ->url(url('/switch-lang/en'))
-                    ->icon('heroicon-o-globe')
-                    ->activeIcon('heroicon-o-globe-alt'),
-
-                NavigationItem::make('العربية')
-                    ->url(url('/switch-lang/ar'))
-                    ->icon('heroicon-o-globe')
-                    ->activeIcon('heroicon-o-globe-alt'),
-            ]);
-    }
     public function boot(): void
     {
+        $this->registerFilamentHooks();
+    }
+
+    protected function registerFilamentHooks(): void
+    {
         Filament::serving(function () {
-            Log::info('Filament serving...');
-            App::setLocale(session('locale', 'en'));
+            $this->handleLocale();
         });
 
         Filament::registerRenderHook('head.start', function () {
-            Log::info('Filament hook executed: setting lang = ' . App::getLocale());
-            return "<script>document.documentElement.setAttribute('lang', '" . App::getLocale() . "');</script>";
+            return $this->generateLangScript();
         });
+    }
+
+    protected function handleLocale(): void
+    {
+        $locale = session('locale', 'en');
+        App::setLocale($locale);
+        Log::info('Filament serving with locale: '.$locale);
+    }
+
+    protected function generateLangScript(): string
+    {
+        $locale = App::getLocale();
+        Log::info('Filament hook executed: setting lang = '.$locale);
+        return "<script>document.documentElement.setAttribute('lang', '$locale');</script>";
+    }
+
+    public function panel(Panel $panel): Panel
+    {
+        return $panel->navigationItems($this->getNavigationItems());
+    }
+
+    protected function getNavigationItems(): array
+    {
+        return [
+            $this->createNavigationItem('English', '/switch-lang/en'),
+            $this->createNavigationItem('العربية', '/switch-lang/ar'),
+        ];
+    }
+
+    protected function createNavigationItem(string $label, string $url): NavigationItem
+    {
+        return NavigationItem::make($label)
+            ->url(url($url))
+            ->icon('heroicon-o-globe')
+            ->activeIcon('heroicon-o-globe-alt');
     }
 }
