@@ -41,20 +41,20 @@ return [
         ],
 
         'api' => [
-            'driver'   => 'token',
+            'driver' => 'token',
             'provider' => 'users',
-            'hash'     => false,
+            'hash' => false,
         ],
 
         'user' => [
-            'driver'  => 'sanctum',
+            'driver' => 'sanctum',
             'provider' => 'users',
         ],
 
-        'provider' => [
-            'driver'  => 'sanctum',
-            'provider' => 'providers',
-        ],
+//        'provider' => [
+//            'driver'  => 'sanctum',
+//            'provider' => 'providers',
+//        ],
 
         'admin' => [
             'driver' => 'session',
@@ -81,12 +81,12 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', \Modules\Users\Models\User::class),
+            'model' => env('AUTH_MODEL', \Modules\Users\App\Models\User::class),
         ],
 
         'admins' => [
             'driver' => 'eloquent',
-            'model' => Admin::class,
+            'model' => \Modules\Admins\App\Models\Admin::class,
         ],
     ],
 

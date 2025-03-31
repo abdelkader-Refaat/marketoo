@@ -14,10 +14,8 @@ class SiteLang
         if (app('lang') && in_array(app('lang'), languages())) {
             $lang = app('lang');
         }
-
         App::setLocale($lang);
         Carbon::setLocale($lang);
-
         return $next($request);
     }
 }

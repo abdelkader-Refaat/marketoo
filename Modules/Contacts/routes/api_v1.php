@@ -14,6 +14,6 @@ use Modules\Contacts\App\Http\Controllers\ContactsController;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('contacts', ContactsController::class)->names('contacts');
 });

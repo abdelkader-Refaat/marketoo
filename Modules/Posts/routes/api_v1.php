@@ -14,6 +14,6 @@ use Modules\Posts\App\Http\Controllers\Api\V1\PostController;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('posts', PostController::class)->names('posts');
 });
