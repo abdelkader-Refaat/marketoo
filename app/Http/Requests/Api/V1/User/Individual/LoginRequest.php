@@ -12,10 +12,14 @@ class LoginRequest extends BaseApiRequest
 
     public function rules(): array
     {
-//        dd(request()->all());
         return [
-            'country_code' => ['required', 'numeric', 'digits_between:1,5', Rule::exists('countries', 'key')],
-            'phone' => ['required', 'numeric', 'digits_between:9,10'],
+//            'country_code' => ['required', 'numeric', 'digits_between:1,5', Rule::exists('countries', 'key')],
+            'country_code' => 'required_if:email,null|numeric|digits_between:1,5|'.Rule::exists('countries', 'key'),
+            'phone' => ['nullable', 'required_if:email,null', 'numeric', 'digits_between:9,10'],
+            'email' => 'nullable|required_if:phone,null|email|exists:users,email,deleted_at,NULL|max:50',
+            'password' => 'required|min:6|max:100',
+            'device_id' => 'required|max:250',
+            'device_type' => 'required|in:'.$this->deviceTypes(),
             'type' => ['required', Rule::in([UserTypesEnum::INDIVIDUAL->value])],
             'user' => 'nullable'
         ];

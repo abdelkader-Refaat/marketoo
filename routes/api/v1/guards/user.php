@@ -26,15 +26,17 @@ Route::group(['middleware' => ['auth:user', 'is_blocked']], function () {
     });
 });
 
-Route::middleware('auth:user')->group(function () {
-    // profile
+Route::middleware(['auth:user', 'is-active'])->group(function () {
+    Route::post('delete-account', [AuthController::class, 'deleteAccount']);
+//    Start of Notifications
+    require __DIR__.'/../notification.php';
+//    End of Notifications
+
+//    start of Profile
     Route::group(['prefix' => 'profile', 'controller' => ProfileController::class], function () {
         Route::get('/', 'profile');
         Route::put('update', 'update');
         Route::patch('update-password', 'updatePassword');
     });
-
-    Route::group(['prefix' => 'notification'], function () {
-        require __DIR__.'/../notification.php';
-    });
+//    End Of Profile
 });

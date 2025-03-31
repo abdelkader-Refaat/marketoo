@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['OptionalSanctumMiddleware']], function () {
     Route::controller(SettingController::class)->group(function () {
         // change language
-        Route::get('change-lang', 'changeLang');
+        Route::patch('change-lang', 'changeLang');
         // get terms and conditions
         Route::get('terms/{type}', 'terms');
     });
@@ -20,7 +20,6 @@ Route::group(['middleware' => ['OptionalSanctumMiddleware']], function () {
         // get cities of specific country
         Route::get('{country_id}/cities', [CountriesCitiesController::class, 'getCountryCities']);
     });
-
     // New Routes here
 });
 

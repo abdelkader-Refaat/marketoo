@@ -13,6 +13,7 @@ use App\Services\AllUsers\ClientService;
 use App\Services\Auth\AuthService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Users\App\Models\User;
 
@@ -20,7 +21,6 @@ class AuthController extends Controller
 {
 
     use ResponseTrait;
-
 
     private $authService, $userService;
 
@@ -30,17 +30,49 @@ class AuthController extends Controller
         $this->userService = new ClientService();
     }
 
-    public function login(LoginRequest $request): JsonResponse
+//    public function login(LoginRequest $request): JsonResponse
+//    {
+//        try {
+//            $data = $this->userService->findOrNew(data: $request->only(['phone', 'country_code', 'type']))['data'];
+//            $data = $this->authService->loginViaPhone($data);
+//            return $this->jsonResponse(msg: $data['msg'], data: $data['data'] ?? [], key: $data['key']);
+//        } catch (\Exception $e) {
+//            return $this->jsonResponse(msg: $e->getMessage(), code: 500, error: true, errors: [
+//                'file' => $e->getFile(), 'line' => $e->getLine()
+//            ]);
+//        }
+//    }
+    /**
+     * Handle user login request
+     */
+    public function login(LoginRequest $request)
     {
-        try {
-            $data = $this->userService->findOrNew(data: $request->only(['phone', 'country_code', 'type']))['data'];
-            $data = $this->authService->loginViaPhone($data);
-            return $this->jsonResponse(msg: $data['msg'], data: $data['data'] ?? [], key: $data['key']);
-        } catch (\Exception $e) {
-            return $this->jsonResponse(msg: $e->getMessage(), code: 500, error: true, errors: [
-                'file' => $e->getFile(), 'line' => $e->getLine()
-            ]);
-        }
+        $result = $this->authService->login($request->validated());
+
+        return match ($result['key']) {
+            'fail' => $this->failMsg($result['msg']),
+            'blocked' => $this->blockedReturn($result['user']),
+            'needActive' => $this->handleInactiveUser($result['user']),
+            'success' => $this->handleSuccessfulLogin($result['user']),
+            default => $this->failMsg(__('auth.failed'))
+        };
+    }
+
+    protected function handleInactiveUser(User $user)
+    {
+        $user->sendVerificationCode();
+        return $this->phoneActivationReturn($user);
+    }
+
+    protected function handleSuccessfulLogin(User $user)
+    {
+        $user->sendVerificationCode();
+        $token = $user->login();
+        return $this->response(
+            'success',
+            msg: __('apis.signed'),
+            data: ['user' => UserResource::make($user)->setToken($token)]
+        );
     }
 
     public function activate(ActivateRequest $request): JsonResponse
@@ -86,6 +118,42 @@ class AuthController extends Controller
         $this->authService->resendCode($request->validated());
 
         return $this->response('success', __('auth.code_re_send'));
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        return $this->authService->deleteAccount($request)
+            ? $this->successMsg(__('auth.account_deleted')) : $this->failMsg(__('apis.something_went_wrong'));
+    }
+
+    protected function failedLoginResponse(string $message): JsonResponse
+    {
+        return $this->respondWithError($message, 401);
+    }
+
+    protected function blockedUserResponse($user): JsonResponse
+    {
+        return $this->respondWithError(__('auth.blocked'), 403, [
+            'user' => UserResource::make($user)
+        ]);
+    }
+
+    protected function inactiveUserResponse($user): JsonResponse
+    {
+        $user->sendVerificationCode();
+        return $this->respondWithError(__('auth.not_active'), 403, [
+            'user' => UserResource::make($user)
+        ]);
+    }
+
+    protected function successfulLoginResponse($user): JsonResponse
+    {
+        $user->sendVerificationCode();
+        $token = $user->createAuthToken();
+
+        return $this->respondWithSuccess(__('auth.signed'), [
+            'user' => UserResource::make($user)->additional(['token' => $token])
+        ]);
     }
 
 

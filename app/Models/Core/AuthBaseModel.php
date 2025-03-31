@@ -26,10 +26,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class AuthBaseModel extends Authenticatable
 {
+    const IMAGEPATH = 'users';
 
     use Notifiable, UploadTrait, HasApiTokens, SmsTrait, SoftDeletes, HasFactory;
-
-    const IMAGEPATH = 'users';
+    protected $hidden = ['password'];
 
     public static function boot()
     {
