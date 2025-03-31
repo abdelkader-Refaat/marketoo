@@ -5,8 +5,8 @@ namespace App\Services\Payment;
 use App\Models\Wallet\Wallet;
 
 use App\Traits\ResponseTrait;
-use App\Models\AllUsers\Admin;
 use App\Enums\WalletTransactionEnum;
+use Modules\Admins\App\Models\Admin;
 
 class PayProcess
 {
@@ -20,7 +20,7 @@ class PayProcess
 
         $toWallet->transactions()->create([
             'amount' => $amount,
-            'type'   => WalletTransactionEnum::CHARGE,
+            'type' => WalletTransactionEnum::CHARGE,
         ]);
 
         return true;
@@ -34,7 +34,7 @@ class PayProcess
 
         $fromWallet->walletHistory()->create([
             'amount' => $amount,
-            'type'   => WalletTransactionEnum::DEBT,
+            'type' => WalletTransactionEnum::DEBT,
         ]);
 
         return true;

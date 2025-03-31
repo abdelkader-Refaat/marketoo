@@ -2,8 +2,6 @@
 
 namespace App\Models\Chat;
 
-use App\Models\AllUsers\User;
-use App\Models\AllUsers\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,7 +36,7 @@ class Room extends Model
         return $this->morphedByMany(User::class, 'memberable', 'room_members');
     }
 
-    public function createable():MorphTo
+    public function createable(): MorphTo
     {
         return $this->morphTo();
     }

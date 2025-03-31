@@ -12,7 +12,7 @@ use App\Services\CountryCities\CountryService;
 use App\Services\Core\NotificationService;
 use App\Http\Requests\Admin\AllUsers\Admin\StoreRequest;
 use App\Http\Requests\Admin\AllUsers\Admin\UpdateRequest;
-use App\Models\AllUsers\Admin;
+use Modules\Admins\App\Models\Admin;
 
 class AdminController extends AdminBasicController
 {

@@ -2,8 +2,8 @@
 
 namespace App\Services\AllUsers;
 
-use App\Models\AllUsers\Admin;
 use App\Services\Core\BaseService;
+use Modules\Admins\App\Models\Admin;
 
 class AdminService extends BaseService
 {
@@ -11,6 +11,6 @@ class AdminService extends BaseService
 
     public function __construct()
     {
-        $this->model = \Modules\Users\Models\Admin::class;
+        $this->model = Admin::class;
     }
 }

@@ -6,8 +6,8 @@ use App\Jobs\Notify;
 use App\Jobs\SendSms;
 use App\Jobs\AdminNotify;
 use App\Jobs\SendEmailJob;
-use App\Models\AllUsers\User;
-use App\Models\AllUsers\Admin;
+use Modules\Admins\App\Models\Admin;
+use Modules\Users\App\Models\User;
 
 
 class NotificationService
@@ -15,7 +15,6 @@ class NotificationService
 
     public function send($request): array
     {
-
         if ($request->user_type === 'all') {
             $this->sendNotificationToAll($request);
         } else {
@@ -28,6 +27,27 @@ class NotificationService
             };
         }
         return ['key' => 'success', 'msg' => __('apis.success')];
+    }
+
+    protected function sendNotificationToAll($request): void
+    {
+        dispatch(new Notify(User::all(), $request));
+        dispatch(new AdminNotify(Admin::all(), $request));
+    }
+
+    public function all($user, $paginateNum = 10): array
+    {
+        $notifications = $user->notifications()->paginate($paginateNum);
+        return ['key' => 'success', 'notifications' => $notifications, 'msg' => __('apis.success')];
+    }
+
+    protected function getRows($type, $id = null)
+    {
+        return match ($type) {
+            'users' => $id ? User::findOrFail($id) : User::all(),
+            'admins' => Admin::all(),
+            default => collect(), // Return an empty collection if the $type doesn't match any case
+        };
     }
 
     protected function sendNotification($rows, $type, $request): void
@@ -44,27 +64,6 @@ class NotificationService
     protected function sendSms($phones, $message): void
     {
         dispatch(new SendSms($phones, $message));
-    }
-
-    protected function getRows($type, $id = null)
-    {
-        return match ($type) {
-            'users' => $id ? User::findOrFail($id) : User::all(),
-            'admins' => Admin::all(),
-            default => collect(), // Return an empty collection if the $type doesn't match any case
-        };
-    }
-
-    protected function sendNotificationToAll($request): void
-    {
-        dispatch(new Notify(User::all(), $request));
-        dispatch(new AdminNotify(Admin::all(), $request));
-    }
-
-    public function all($user, $paginateNum = 10): array
-    {
-        $notifications = $user->notifications()->paginate($paginateNum);
-        return ['key' => 'success', 'notifications' => $notifications, 'msg' => __('apis.success')];
     }
 
     public function markAsReadNotifications($user): array

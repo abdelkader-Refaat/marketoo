@@ -3,10 +3,10 @@
 namespace App\Services\AllUsers;
 
 
-use App\Models\AllUsers\User;
 use App\Models\PublicSections\Complaint;
 use App\Models\Wallet\WalletTransaction;
 use App\Services\Core\BaseService;
+use Modules\Users\App\Models\User;
 
 class ClientService extends BaseService
 {
@@ -17,13 +17,14 @@ class ClientService extends BaseService
 
     public function details($user)
     {
-
         if (request()->type == 'main_data') {
             $html = view('admin.clients.parts.main_data', ['row' => $user])->render();
         }
 
         if (request()->type == 'complaints') {
-            $complaints = Complaint::where(['complaintable_id' => $user->id, 'complaintable_type' => get_class($user)])->paginate(10);
+            $complaints = Complaint::where([
+                'complaintable_id' => $user->id, 'complaintable_type' => get_class($user)
+            ])->paginate(10);
             $html = view('admin.clients.parts.complaints', compact('complaints'))->render();
         }
         if (request()->type == 'wallet') {
@@ -40,7 +41,7 @@ class ClientService extends BaseService
 
     public function findOrNew($data = [])
     {
-        $user = User::firstOrCreate($data, $data);
+        $user = User::query()->firstOrCreate($data, $data);
         return ['key' => 'success', 'msg' => 'success', 'data' => $user];
     }
 

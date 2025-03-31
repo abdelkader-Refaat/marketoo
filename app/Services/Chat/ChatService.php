@@ -7,8 +7,8 @@ use DB;
 use App\Models\Chat\Room;
 use App\Traits\UploadTrait;
 use App\Models\Chat\Message;
-use App\Models\AllUsers\Admin;
 use App\Models\Chat\MessageNotification;
+use Modules\Admins\App\Models\Admin;
 
 class ChatService
 {

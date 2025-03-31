@@ -34,8 +34,8 @@ class ProfileController extends Controller
 
     public function update(UpdateProfileRequest $request): JsonResponse
     {
-        $this->profileService->editProfile($request->validated());
-        return $this->successMsg(__('apis.updated'));
+        $updatedProfile = $this->profileService->editProfile($request->validated());
+        return $this->jsonResponse(msg: __('apis.updated'), data: $updatedProfile);
     }
 
     // change user phone

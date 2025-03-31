@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
-use App\Models\AllUsers\User;
 use App\Models\Core\BaseModel;
+use Modules\Users\App\Models\User;
 use Spatie\Translatable\HasTranslations;
 
 class City extends BaseModel
 {
     use HasTranslations;
 
-    protected $fillable = ['name', 'country_id'];
-
     public $translatable = ['name'];
+    protected $fillable = ['name', 'country_id'];
 
     public function users()
     {

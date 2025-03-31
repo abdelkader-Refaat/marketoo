@@ -15,12 +15,11 @@ class AuthService extends BaseService
     public function loginViaPhone($user): array
     {
         $user->sendVerificationCode();
-
         return [
-            'key'  => 'success',
-            'msg'  => __('auth.send_verification_code_to_phone'),
+            'key' => 'success',
+            'msg' => __('auth.send_verification_code_to_phone'),
             'data' => [
-                'phone'        => $user->phone,
+                'phone' => $user->phone,
                 'country_code' => $user->country_code
             ]
         ];
@@ -30,11 +29,11 @@ class AuthService extends BaseService
     {
         $token = $user->login();
         return [
-            'key'  => 'success',
-            'msg'  => __('auth.success_login'),
+            'key' => 'success',
+            'msg' => __('auth.success_login'),
             'data' => [
                 'token' => $token,
-                'user'  => $user->refresh(),
+                'user' => $user->refresh(),
             ]
         ];
     }
@@ -45,11 +44,11 @@ class AuthService extends BaseService
         $request['user']->markAsActive();
         // Return the response data
         return [
-            'key'  => 'success',
-            'msg'  => $msg,
+            'key' => 'success',
+            'msg' => $msg,
             'data' => [
                 'token' => $request['user']->login(),
-                'user'  => $request['user']->refresh(),
+                'user' => $request['user']->refresh(),
             ]
         ];
     }
@@ -61,8 +60,8 @@ class AuthService extends BaseService
         $user = $this->model::updateOrCreate(['id' => $auth_user_id], $request);
 
         return [
-            'key'  => 'success',
-            'msg'  => __('auth.registered_success'),
+            'key' => 'success',
+            'msg' => __('auth.registered_success'),
             'user' => $user->refresh()
         ];
     }
@@ -71,8 +70,8 @@ class AuthService extends BaseService
     {
         $request['user']->sendVerificationCode();
         return [
-            'key'  => 'success',
-            'msg'  => __('auth.code_re_send'),
+            'key' => 'success',
+            'msg' => __('auth.code_re_send'),
             'user' => $request['user']->refresh()
         ];
     }

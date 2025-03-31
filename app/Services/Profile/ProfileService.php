@@ -2,10 +2,10 @@
 
 namespace App\Services\Profile;
 
-use App\Models\AllUsers\User;
 use App\Models\Core\AuthUpdate;
 use App\Services\Core\BaseService;
 use App\Enums\AuthUpdatesAttributesEnum;
+use Modules\Users\App\Models\User;
 
 class ProfileService extends BaseService
 {
@@ -44,18 +44,19 @@ class ProfileService extends BaseService
     protected function sendCode($user, $update): void
     {
         match ($update->attribute) {
-            filter_var($update->attribute, FILTER_VALIDATE_EMAIL) => $user->sendCodeAtEmail($update->code, $update->attribute),
-            default => $user->sendCodeAtSms($update->code, $update->country_code . $update->attribute),
+            filter_var($update->attribute, FILTER_VALIDATE_EMAIL) => $user->sendCodeAtEmail($update->code,
+                $update->attribute),
+            default => $user->sendCodeAtSms($update->code, $update->country_code.$update->attribute),
         };
     }
 
     public function verifyCode($user, $request): array
     {
         $row = $user->authUpdates()->where([
-            'attribute'    => $request['phone'] ?? $request['email'],
+            'attribute' => $request['phone'] ?? $request['email'],
             'country_code' => $request['country_code'],
-            'code'         => $request['code'],
-            'type'         => $request['type']
+            'code' => $request['code'],
+            'type' => $request['type']
         ])->first();
 
 
@@ -66,15 +67,17 @@ class ProfileService extends BaseService
             ],
             AuthUpdatesAttributesEnum::NewPhone->value => [
                 $user->update([
-                    'phone'        => $row->attribute,
+                    'phone' => $row->attribute,
                     'country_code' => $row->country_code,
                 ]),
-                $user->authUpdates()->whereIn('type', [AuthUpdatesAttributesEnum::Phone->value, AuthUpdatesAttributesEnum::NewPhone->value])->delete(),
+                $user->authUpdates()->whereIn('type',
+                    [AuthUpdatesAttributesEnum::Phone->value, AuthUpdatesAttributesEnum::NewPhone->value])->delete(),
                 'msg' => __('apis.phone_changed'),
             ],
             AuthUpdatesAttributesEnum::NewEmail->value => [
                 $user->update(['email' => $row->attribute]),
-                $user->authUpdates()->whereIn('type', [AuthUpdatesAttributesEnum::Email->value, AuthUpdatesAttributesEnum::NewEmail->value])->delete(),
+                $user->authUpdates()->whereIn('type',
+                    [AuthUpdatesAttributesEnum::Email->value, AuthUpdatesAttributesEnum::NewEmail->value])->delete(),
                 'msg' => __('apis.email_changed'),
             ],
             default => [

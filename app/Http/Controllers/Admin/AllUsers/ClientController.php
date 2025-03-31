@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin\AllUsers;
 
 use App\Traits\ReportTrait;
 use Illuminate\Http\Request;
-use App\Models\AllUsers\User;
 use App\Services\AllUsers\ClientService;
 use App\Services\Core\NotificationService;
 use App\Services\CountryCities\CityService;
@@ -14,12 +13,14 @@ use App\Http\Requests\Admin\AllUsers\Client\StoreRequest;
 use App\Http\Requests\Admin\AllUsers\Client\UpdateRequest;
 use App\Http\Requests\Admin\Core\Notification\SendRequest;
 use App\Http\Requests\Admin\Core\Wallet\UpdateBalanceRequest;
+use Modules\Users\App\Models\User;
 
 class ClientController extends AdminBasicController
 {
 
     protected $countryService;
     protected $cityService;
+
     public function __construct()
     {
         $this->countryService = new CountryService();
@@ -56,7 +57,7 @@ class ClientController extends AdminBasicController
     public function updateBalance(UpdateBalanceRequest $request, $id)
     {
         $data = $this->serviceName->updateBalance(type: $request->type, id: $id, balance: $request->balance);
-        return response()->json(['msg' => $data['msg'], 'balance' => $data['balance'] . ' ' . __('site.currency')]);
+        return response()->json(['msg' => $data['msg'], 'balance' => $data['balance'].' '.__('site.currency')]);
     }
 
     public function show($id)

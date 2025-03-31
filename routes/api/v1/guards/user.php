@@ -2,10 +2,11 @@
 
 use app\Http\Controllers\Api\V1\User\Individual\AuthController;
 use Illuminate\Support\Facades\Route;
+use app\Http\Controllers\Api\V1\User\ProfileController;
 
 Route::group(['middleware' => ['guest:sanctum'], 'controller' => AuthController::class], function () {
     Route::post('register', 'register')->name('register');
-    Route::post('login', 'login');
+    Route::post('log-in', 'login');
     Route::post('resend-code', 'resendCode');
     Route::post('check-code', 'activate');
 });
@@ -26,6 +27,13 @@ Route::group(['middleware' => ['auth:user', 'is_blocked']], function () {
 });
 
 Route::middleware('auth:user')->group(function () {
+    // profile
+    Route::group(['prefix' => 'profile', 'controller' => ProfileController::class], function () {
+        Route::get('/', 'profile');
+        Route::put('update', 'update');
+        Route::patch('update-password', 'updatePassword');
+    });
+
     Route::group(['prefix' => 'notification'], function () {
         require __DIR__.'/../notification.php';
     });

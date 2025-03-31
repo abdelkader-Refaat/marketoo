@@ -8,16 +8,18 @@ use app\Http\Requests\Api\V1\User\Individual\LoginRequest;
 use app\Http\Requests\Api\V1\User\Individual\RegisterRequest;
 use app\Http\Requests\Api\V1\User\Individual\ResendCodeRequest;
 use App\Http\Resources\Api\User\UserResource;
-use App\Models\AllUsers\User;
 use App\Services\Auth\AuthService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Modules\Users\App\Models\User;
 
 class AuthController extends Controller
 {
 
     use ResponseTrait;
+
     protected $authService;
+
     public function __construct()
     {
         $this->authService = new AuthService(User::class);
@@ -27,7 +29,7 @@ class AuthController extends Controller
     {
         $data = $this->authService->register(request: $request->validated());
         return $this->response($data['key'], $data['msg'], [
-            'user'  => UserResource::make($data['user'])
+            'user' => UserResource::make($data['user'])
         ]);
     }
 
@@ -43,8 +45,8 @@ class AuthController extends Controller
         $data = $this->authService->activate($request->validated());
 
         return $this->response('success', $data['msg'], [
-            'user'                  => UserResource::make($data['data']['user'])->setToken($data['data']['token']),
-            'go_to_register_step'   => true
+            'user' => UserResource::make($data['data']['user'])->setToken($data['data']['token']),
+            'go_to_register_step' => true
         ]);
     }
 

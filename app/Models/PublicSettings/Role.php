@@ -2,8 +2,8 @@
 
 namespace App\Models\PublicSettings;
 
-use App\Models\AllUsers\Admin;
 use App\Models\Core\BaseModel;
+use Modules\Admins\App\Models\Admin;
 use Spatie\Translatable\HasTranslations;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -12,9 +12,8 @@ class Role extends BaseModel
     use SoftDeletes;
     use HasTranslations;
 
-    protected $fillable = ['name'];
-
     public $translatable = ['name'];
+    protected $fillable = ['name'];
 
     public function permissions()
     {
