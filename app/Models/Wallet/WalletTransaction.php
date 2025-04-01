@@ -2,36 +2,34 @@
 
 namespace App\Models\Wallet;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Core\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class WalletTransaction extends Model
+class WalletTransaction extends BaseModel
 {
-    use HasFactory;
 
     protected $fillable = [
         'wallet_id',
-        'type',
-        'amount',
         'transactionable_id',
         'transactionable_type',
+        'pay_type',
+        'amount',
     ];
 
-    public function getTypeTextAttribute($value)
+    public function getTypeTextAttribute($value): string
     {
-        return  __('admin.wallet_type_'.$this->attributes['type']) ;
+        return __('admin.wallet_type_'.$this->attributes['pay_type']);
     }
 
 
-
-    public function wallet()
+    public function wallet(): BelongsTo
     {
         return $this->belongsTo(Wallet::class, 'wallet_id', 'id');
     }
 
 
-
-    public function transactionable()
+    public function transactionable(): MorphTo
     {
         return $this->morphTo();
     }

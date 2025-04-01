@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Payment;
+namespace App\Services\PaymentGateways;
 
 use App\Models\Wallet\Wallet;
 

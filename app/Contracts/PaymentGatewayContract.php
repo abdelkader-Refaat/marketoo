@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 interface PaymentGatewayContract
 {
-    public function sendPayment(Request $request);
+    public function sendPayment(array $data);
 
     public function callBack(Request $request);
 }

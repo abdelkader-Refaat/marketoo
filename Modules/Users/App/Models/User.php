@@ -3,8 +3,10 @@
 namespace Modules\Users\App\Models;
 
 use App\Models\Core\AuthBaseModel;
+use App\Models\PaymentTransaction;
 use App\Models\PublicSettings\Role;
 use App\Traits\Admin\Users\RelationsTrait;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class User extends AuthBaseModel
 {
@@ -33,6 +35,10 @@ class User extends AuthBaseModel
         'code_expire',
     ];
 
+    public function paymentTransactions(): MorphMany
+    {
+        return $this->morphMany(PaymentTransaction::class, 'payer');
+    }
 
     protected function casts(): array
     {

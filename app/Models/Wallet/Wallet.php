@@ -2,12 +2,12 @@
 
 namespace App\Models\Wallet;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Core\BaseModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Wallet extends Model
+class Wallet extends BaseModel
 {
-    use HasFactory;
 
     protected $fillable = [
         'walletable_id',
@@ -17,14 +17,14 @@ class Wallet extends Model
         'debt_balance',
     ];
 
-    public function walletable()
+    public function walletable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
-        return $this->hasMany(WalletTransaction::class, 'wallet_id', 'id');
+        return $this->hasMany(WalletTransaction::class);
     }
 
 }
