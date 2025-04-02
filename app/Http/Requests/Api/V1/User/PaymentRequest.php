@@ -4,6 +4,7 @@ namespace App\Http\Requests\Api\V1\User;
 
 use app\Http\Requests\Api\V1\BaseApiRequest;
 use App\Enums\MyFatoorahPaymentMethod;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 class PaymentRequest extends BaseApiRequest
@@ -26,7 +27,11 @@ class PaymentRequest extends BaseApiRequest
         return [
             'amount' => ['required', 'numeric', 'min:0.1'],
             'currency' => ['sometimes', 'string', 'size:3'],
-            'payment_method_id' => ['required', 'numeric', new Enum(MyFatoorahPaymentMethod::class)], // Enum validation
+            'payment_method_id' => [
+                Rule::requiredIf(config('payments.active_gateway') === 'Myfatoorah'),
+                new Enum(MyFatoorahPaymentMethod::class)
+            ],
+            // Enum validation
             'name' => [
                 'required_if:payment_method_id,'.implode(',', $this->nameRequiredMethods()), 'string', 'max:255',
                 'min:3'

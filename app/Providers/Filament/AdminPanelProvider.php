@@ -31,8 +31,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()  // This is enough for authentication
-            ->authGuard('filament') // Ensure Filament uses the `filament` guard
+            ->login()
+            ->authGuard('filament')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -58,7 +58,7 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
+                Authenticate::class, // Only here, not in both places
             ]);
     }
 

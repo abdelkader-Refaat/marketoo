@@ -2,24 +2,22 @@
 
 namespace App\Http\Middleware;
 
-use App\Traits\AdminFirstRouteTrait;
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 
-class RedirectIfAuthenticated {
-  use AdminFirstRouteTrait;
-  public function handle($request, Closure $next, $guard = null) {
-    if (Auth::guard($guard)->check()) {
+class RedirectIfAuthenticated
+{
+    public function handle($request, Closure $next, $guard = null)
+    {
+        if ($request->is('admin*')) {
+            return $next($request);
+        }
+        if (Auth::guard($guard)->check()) {
+            return $guard === 'filament'
+                ? redirect('/admin')  // Filament's default dashboard
+                : redirect('/');      // Your frontend redirect
+        }
 
-      if ('admin' == $guard) {
-        return redirect()->route($this->getAdminFirstRouteName());
-      } else {
-        return redirect()->route('intro');
-      }
-
+        return $next($request);
     }
-
-    return $next($request);
-  }
 }

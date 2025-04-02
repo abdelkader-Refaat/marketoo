@@ -38,12 +38,14 @@ class HyperpayService extends BasePaymentService implements PaymentGatewayContra
             $responseData = $apiResponse['data'];
 
             if (isset($responseData['id'])) {
+                // Map HyperPay response to match MyFatoorah's expected format
                 return [
                     'gateway' => 'hyperpay',
                     'status' => 'requires_redirect',
-                    'message' => 'Checkout created successfully',
-                    'redirect_url' => config("payments.{$this->gatewayName}.CHECKOUT_URL").'?checkoutId='.$responseData['id'],
-                    'checkout_id' => $responseData['id'],
+                    'message' => 'Payment widget ready for initialization',
+                    'payment_url' => config("payments.{$this->gatewayName}.CHECKOUT_URL").'?checkoutId='.$responseData['id'],
+                    'invoice_id' => $responseData['id'],
+                    'widget_required' => true, // New flag to indicate widget integration
                     'http_status' => 200
                 ];
             }
@@ -90,17 +92,17 @@ class HyperpayService extends BasePaymentService implements PaymentGatewayContra
 
     protected function getGatewayName(): string
     {
-        return 'Hyperpay';
+        return ucfirst(config("payments.active_gateway"));
     }
 
     protected function getDefaultHeaders(): array
     {
         $config = config("payments.{$this->gatewayName}");
         $apiToken = $this->testMode ? $config['TEST_API_TOKEN'] : $config['LIVE_API_TOKEN'];
-
         return [
             'Authorization' => 'Bearer '.$apiToken,
             'Content-Type' => 'application/x-www-form-urlencoded',
+            'Accept' => 'application/json', // Explicitly request JSON response
         ];
     }
 }

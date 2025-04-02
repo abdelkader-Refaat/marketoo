@@ -95,18 +95,15 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
         return $responseData['success'] && $responseData['data']['InvoiceStatus'] === 'Paid';
     }
 
-
     protected function getGatewayName(): string
     {
-        return 'Myfatoorah';
+        return ucfirst(config("payments.active_gateway"));
     }
-
 
     protected function getDefaultHeaders(): array
     {
         $config = config("payments.{$this->gatewayName}");
         $apiToken = $this->testMode ? $config['TEST_API_TOKEN'] : $config['LIVE_API_TOKEN'];
-
         return [
             'Authorization' => 'Bearer '.$apiToken,
             'Content-Type' => 'application/json',

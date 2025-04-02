@@ -14,72 +14,38 @@ use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: [
-//            __DIR__.'/../routes/auth.php',    // Auth routes
-//            __DIR__.'/../routes/settings.php', // Settings routes
-//            __DIR__.'/../routes/web.php',      // Main web routes
-//            __DIR__.'/../routes/site.php'     // Site routes
-        ],
+        web: [],
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            // Admin Web Routes Group
-            // Admin Routes - Each with its own prefix and name
+            // Frontend Routes
             Route::middleware('web')->group(function () {
-                // Auth routes - /admin/auth
-                Route::prefix('admin/auth')
-                    ->name('admin.auth.')
-                    ->group(base_path('routes/admin/auth.php'));
+                Route::prefix('site')
+                    ->name('site.')
+                    ->group(function () {
+                        require base_path('routes/front/auth.php');
+                        require base_path('routes/front/settings.php');
+                        require base_path('routes/front/site.php');
+                    });
 
-                // Settings routes - /admin/settings
-                Route::prefix('admin/settings')
-                    ->name('admin.settings.')
-                    ->group(base_path('routes/admin/settings.php'));
-
-                // Main web routes - /admin
+                // Admin Routes
                 Route::name('admin.')
                     ->group(base_path('routes/web.php'));
-
-                // Site routes - /admin/site
-                Route::prefix('admin/site')
-                    ->name('admin.site.')
-                    ->group(base_path('routes/admin/site.php'));
             });
-            // API Version 1 routes
+
+            // API Routes v1
             Route::middleware('api')
                 ->prefix('api/v1')
                 ->name('api.v1.')
                 ->group(function () {
-                    // General routes (no additional prefix)
                     require __DIR__.'/../routes/api/v1/api.php';
-
-                    Route::prefix('general')
-                        ->group(function () {
-                            require __DIR__.'/../routes/api/v1/guards/general.php';
-                        });
-
-                    Route::prefix('individual-user')
-                        ->group(function () {
-                            require __DIR__.'/../routes/api/v1/guards/user.php';
-                        });
-
-//                    Route::prefix('provider')
-//                        ->group(function () {
-//                            require __DIR__.'/../routes/api/v1/guards/provider.php';
-//                        });
-                    // Add other route files as needed
+                    require __DIR__.'/../routes/api/v1/guards/general.php';
+                    require __DIR__.'/../routes/api/v1/guards/user.php';
                 });
-
-            // Future-proof structure for new versions
-            // Route::middleware('api')
-            //     ->prefix('api/v2')
-            //     ->name('api.v2.')
-            //     ->group(function () {
-            //         require __DIR__.'/../routes/api/v2/auth.php';
-            //     });
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Global Middleware
         $middleware->append([
             \App\Http\Middleware\TrustProxies::class,
             \App\Http\Middleware\CheckForMaintenanceMode::class,
@@ -88,6 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         ]);
 
+        // Named Middleware
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
             'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
@@ -113,10 +80,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
             'inertia' => \App\Http\Middleware\HandleInertiaRequests::class,
-
+            'filament' => \App\Http\Middleware\RedirectIfNotFilamentAdmin::class,
 
         ]);
-
+        // Middleware Groups
         $middleware->group('web', [
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
@@ -125,13 +92,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\HandleInertiaRequests::class, // Inertia middleware
+            \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
-        // Auth middleware group
+
         $middleware->group('auth', [
             \App\Http\Middleware\Authenticate::class,
-            \App\Http\Middleware\EnsureEmailIsVerified::class,
+//            \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
+
         $middleware->group('api', [
             'throttle:60,1',
             \App\Http\Middleware\Api\ApiLang::class,
@@ -144,30 +112,36 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (ModelNotFoundException $exception, Request $request) {
+        $exceptions->render(function (ModelNotFoundException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
                     'key' => 'fail',
                     'code' => ResponseAlias::HTTP_NOT_FOUND,
-                    'msg' => 'Model Not Found' ?? $exception->getMessage(),
+                    'msg' => 'Model Not Found',
                     'status' => [
                         'error' => true,
-                        'validation_errors' => ['line' => $exception->getLine(), 'file' => $exception->getFile()],
+                        'validation_errors' => [
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile()
+                        ],
                     ],
                     'data' => []
                 ], ResponseAlias::HTTP_NOT_FOUND);
             }
         });
 
-        $exceptions->render(function (NotFoundHttpException $exception, Request $request) {
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
                     'key' => 'fail',
                     'code' => ResponseAlias::HTTP_NOT_FOUND,
-                    'msg' => 'Not Found Http' ?? $exception->getMessage(),
+                    'msg' => 'Not Found Http',
                     'status' => [
                         'error' => true,
-                        'validation_errors' => ['line' => $exception->getLine(), 'file' => $exception->getFile()],
+                        'validation_errors' => [
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile()
+                        ],
                     ],
                     'data' => []
                 ], ResponseAlias::HTTP_NOT_FOUND);
@@ -189,50 +163,41 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->render(function (ParseError $exception, Request $request) {
+        $exceptions->render(function (ParseError $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
                     'key' => 'fail',
                     'code' => ResponseAlias::HTTP_INTERNAL_SERVER_ERROR,
-                    'msg' => $exception->getMessage(),
+                    'msg' => $e->getMessage(),
                     'status' => [
                         'error' => true,
-                        'validation_errors' => ['line' => $exception->getLine(), 'file' => $exception->getFile()],
+                        'validation_errors' => [
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile()
+                        ],
                     ],
                     'data' => []
                 ], ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
             }
         });
 
-        $exceptions->render(function (Error $exception, Request $request) {
+        $exceptions->render(function (Error|Exception $e, Request $request) {
             if ($request->is('api/*')) {
+                $code = property_exists($e, 'status') ? $e->status : ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
                 return response()->json([
                     'key' => 'fail',
-                    'code' => $exception->status,
-                    'msg' => $exception->getMessage(),
-                    'status' => [
-                        'error' => true,
-                        'validation_errors' => ['line' => $exception->getLine(), 'file' => $exception->getFile()],
-                    ],
-                    'data' => []
-                ], $exception->status);
-            }
-        });
-
-        $exceptions->render(function (Exception $exception, Request $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'key' => 'fail',
-                    'code' => $exception->status,
-                    'msg' => $exception->getMessage(),
+                    'code' => $code,
+                    'msg' => $e->getMessage(),
                     'status' => [
                         'error' => true,
                         'validation_errors' => [
-                            'line' => $exception->getLine(), 'file' => $exception->getFile()
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile()
                         ],
                     ],
                     'data' => []
-                ], $exception->status);
+                ], $code);
             }
         });
-    })->create();
+    })
+    ->create();

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\User\PaymentRequest;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PaymentController extends Controller
 {
@@ -16,34 +17,42 @@ class PaymentController extends Controller
     {
     }
 
+// app/Http/Controllers/Apis/V1/Payment/PaymentController.php
+
     public function paymentProcess(PaymentRequest $request)
     {
         $gatewayResponse = $this->paymentGateway->sendPayment($request->validated());
-        // Standardize the response format
+
         $responseData = [
             'status' => $gatewayResponse['status'],
             'message' => $gatewayResponse['message'],
-            'gateway' => $gatewayResponse['gateway']
+            'gateway' => $gatewayResponse['gateway'],
         ];
 
-        // Add additional data based on status
-        switch ($gatewayResponse['status']) {
-            case 'requires_redirect':
-                $responseData['redirect_url'] = $gatewayResponse['payment_url'];
-                $responseData['invoice_id'] = $gatewayResponse['invoice_id'];
-                break;
+        if ($gatewayResponse['status'] === 'requires_redirect') {
+            if ($gatewayResponse['gateway'] === 'hyperpay') {
+                $responseData['checkout_id'] = $gatewayResponse['invoice_id'];
+                $responseData['widget_url'] = config("payments.Hyperpay.CHECKOUT_URL").'?checkoutId='.$gatewayResponse['invoice_id'];
+                $responseData['payment_form_url'] = route('payment.hyperpay.form', [
+                    'transaction_id' => $gatewayResponse['invoice_id'],
+                    'brand_type' => 'VISA MASTER AMEX'
+                ]);
 
-            case 'invalid_request':
-                $responseData['valid_methods'] = $gatewayResponse['valid_methods'];
-                break;
-
-            case 'gateway_rejected':
-                if ($gatewayResponse['validation_errors']) {
-                    $responseData['errors'] = $gatewayResponse['validation_errors'];
+                // For Inertia.js requests
+                if ($request->header('X-Inertia')) {
+                    return redirect()->route('payment.hyperpay.inertia-form')->with([
+                        'transaction_id' => $gatewayResponse['invoice_id'],
+                        'brand_type' => 'VISA MASTER AMEX',
+                        'widget_url' => $responseData['widget_url']
+                    ]);
                 }
-                break;
+            } else {
+                // MyFatoorah
+                $responseData['redirect_url'] = $gatewayResponse['payment_url'];
+            }
         }
-        return response()->json($responseData, $gatewayResponse['http_status']);
+
+        return response()->json($responseData, $gatewayResponse['http_status'] ?? 200);
     }
 
     public function callBack(Request $request)
@@ -78,5 +87,14 @@ class PaymentController extends Controller
     {
         // Implement your transaction status check logic
         return response()->json(['status' => 'pending']); // Example
+    }
+
+    // app/Http/Controllers/PaymentController.php
+    public function showHyperpayForm($transaction_id, $brand_type)
+    {
+        return view('payment.hyperpay.payment', [
+            'transaction_id' => $transaction_id,
+            'brand_type' => $brand_type
+        ]);
     }
 }
