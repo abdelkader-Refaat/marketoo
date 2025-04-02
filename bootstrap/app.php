@@ -27,7 +27,6 @@ return Application::configure(basePath: dirname(__DIR__))
                         require base_path('routes/front/settings.php');
                         require base_path('routes/front/site.php');
                     });
-
                 // Admin Routes
                 Route::name('admin.')
                     ->group(base_path('routes/web.php'));

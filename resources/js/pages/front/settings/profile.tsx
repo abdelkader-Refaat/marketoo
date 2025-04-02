@@ -10,13 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import SettingsLayout from '@/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
-        href: '/settings/profile',
-    },
+        href: '/settings/profile'
+    }
 ];
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
@@ -24,14 +24,14 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,
-        email: auth.user.email,
+        email: auth.user.email
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         patch(route('profile.update'), {
-            preserveScroll: true,
+            preserveScroll: true
         });
     };
 

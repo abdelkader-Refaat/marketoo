@@ -1,10 +1,12 @@
-import preset from './vendor/filament/support/tailwind.config.preset'
-
-export default {
-    presets: [preset],
+module.exports = {
     content: [
-        './app/Filament/**/*.php',
-        './resources/views/**/*.blade.php',
-        './vendor/filament/**/*.blade.php',
+        './resources/**/*.{html,js,php,vue}',
+        './node_modules/your-package/**/*.js' // if using UI packages
     ],
-}
+    theme: {
+        extend: {}
+    },
+    plugins: [
+        require('tailwindcss-animate') // if using animations
+    ]
+};

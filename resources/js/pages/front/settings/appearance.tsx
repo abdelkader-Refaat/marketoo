@@ -5,13 +5,13 @@ import HeadingSmall from '@/components/heading-small';
 import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import SettingsLayout from '@/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Appearance settings',
-        href: '/settings/appearance',
-    },
+        href: '/settings/appearance'
+    }
 ];
 
 export default function Appearance() {

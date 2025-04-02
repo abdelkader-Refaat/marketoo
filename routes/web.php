@@ -6,12 +6,12 @@ use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
-
+    return Inertia::render('front/welcome');
+});
+    
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        return Inertia::render('front/dashboard');
     })->name('dashboard');
 });
 
