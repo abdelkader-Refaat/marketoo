@@ -5,16 +5,16 @@ use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        return Inertia::render('front/dashboard');
     })->name('dashboard');
 
     Route::prefix('payments')->name('payments.')->group(function () {
         Route::get('/', function () {
-            return Inertia::render('Payment/Initiate');
+            return Inertia::render('front/Payment/Initiate');
         })->name('initiate');
 
         Route::get('hyperpay/form', function () {
-            return Inertia::render('Payment/HyperPayForm');
+            return Inertia::render('front/Payment/HyperPayForm');
         })->name('hyperpay.form');
     });
 });
