@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
     app:
         build: .
@@ -5,7 +7,7 @@ services:
         working_dir: /var/www/html
         volumes:
             - .:/var/www/html
-            - ./database:/var/www/html/database
+            - ./database:/Users/abdelkader1/Herd/code/marketoo/database/database.sqlite
             - app_data:/var/www/html/storage
             - app_data:/var/www/html/bootstrap/cache
         depends_on:
