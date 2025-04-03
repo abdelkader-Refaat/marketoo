@@ -33,7 +33,7 @@ class PaymentController extends Controller
             if ($gatewayResponse['gateway'] === 'hyperpay') {
                 $responseData['checkout_id'] = $gatewayResponse['invoice_id'];
                 $responseData['widget_url'] = config("payments.Hyperpay.CHECKOUT_URL").'?checkoutId='.$gatewayResponse['invoice_id'];
-                $responseData['payment_form_url'] = route('payment.hyperpay.form', [
+                $responseData['payment_form_url'] = route('site.payments.hyperpay.form', [
                     'transaction_id' => $gatewayResponse['invoice_id'],
                     'brand_type' => 'VISA MASTER AMEX'
                 ]);
