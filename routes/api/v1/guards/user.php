@@ -27,29 +27,30 @@ Route::group(['middleware' => ['auth:user', 'is_blocked']], function () {
     });
 });
 
-Route::middleware(['auth:user', 'is-active'])->group(function () {
-    Route::post('delete-account', [AuthController::class, 'deleteAccount']);
-//    Start of Notifications
-    require __DIR__.'/../notification.php';
-//    End of Notifications
+Route::middleware(['auth:user', 'is-active'])
+    ->prefix('individual-user')
+    ->group(function () {
+//    handle notifications route
+        require_once __DIR__.'/../notification.php';
+        Route::post('delete-account', [AuthController::class, 'deleteAccount']);
 
 //    start of Profile
-    Route::group(['prefix' => 'profile', 'controller' => ProfileController::class], function () {
-        Route::get('/', 'profile');
-        Route::put('update', 'update');
-        Route::patch('update-password', 'updatePassword');
-    });
+        Route::group(['prefix' => 'profile', 'controller' => ProfileController::class], function () {
+            Route::get('/', 'profile');
+            Route::put('update', 'update');
+            Route::patch('update-password', 'updatePassword');
+        });
 //    End Of Profile
 
 //    Start Of Payment
-    Route::prefix('payment')->name('payment.')->group(function () {
-        Route::post('process', [PaymentController::class, 'paymentProcess'])->name('process');
-        Route::get('callback', [PaymentController::class, 'callBack'])->name('callback');
-        Route::get('success', [PaymentController::class, 'success'])->name('success');
-        Route::get('failed', [PaymentController::class, 'failed'])->name('failed');
+        Route::prefix('payment')->name('payment.')->group(function () {
+            Route::post('process', [PaymentController::class, 'paymentProcess'])->name('process');
+            Route::get('callback', [PaymentController::class, 'callBack'])->name('callback');
+            Route::get('success', [PaymentController::class, 'success'])->name('success');
+            Route::get('failed', [PaymentController::class, 'failed'])->name('failed');
 
-        // Status check (optional)
-        Route::get('status/{transaction}', [PaymentController::class, 'status'])->name('status');
-    });
+            // Status check (optional)
+            Route::get('status/{transaction}', [PaymentController::class, 'status'])->name('status');
+        });
 //    End Of Payment
-});
+    });

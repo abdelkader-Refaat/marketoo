@@ -31,7 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 Route::name('admin.')
                     ->group(base_path('routes/web.php'));
             });
-
             // API Routes v1
             Route::middleware('api')
                 ->prefix('api/v1')

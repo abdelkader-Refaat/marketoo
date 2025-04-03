@@ -4,21 +4,21 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('front/welcome');
+    return Inertia::render('welcome');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('front/dashboard');
+        return Inertia::render('dashboard');
     })->name('dashboard');
 
     Route::prefix('payments')->name('payments.')->group(function () {
         Route::get('/', function () {
-            return Inertia::render('front/Payment/Initiate');
+            return Inertia::render('Payment/Initiate');
         })->name('initiate');
 
         Route::get('hyperpay/form', function () {
-            return Inertia::render('front/Payment/HyperPayForm');
+            return Inertia::render('Payment/HyperPayForm');
         })->name('hyperpay.form');
     });
 });
