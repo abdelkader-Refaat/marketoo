@@ -2,12 +2,12 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\LanguageSwitcher;
+use App\Http\Middleware\Admin\AdminLang;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\UserMenuItem;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -29,13 +29,14 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->userMenuItems([
-                UserMenuItem::make()
-                    ->label('🇺🇸 '.__('filament-panels/layout.lang.en'))
-                    ->url(fn() => url('/admin/switch-lang/en')),
-
-                UserMenuItem::make()
-                    ->label('🇸🇦 '.__('filament-panels/layout.lang.ar'))
-                    ->url(fn() => url('/admin/switch-lang/ar')),
+                'language_en' => MenuItem::make()
+                    ->label('🇺🇸 English')
+                    ->url(fn() => url('/admin/switch-lang/en'))
+                    ->visible(fn() => app()->getLocale() !== 'en'),
+                'language_ar' => MenuItem::make()
+                    ->label('🇸🇦 العربية')
+                    ->url(fn() => url('/admin/switch-lang/ar'))
+                    ->visible(fn() => app()->getLocale() !== 'ar'),
             ])
             ->login()
             ->authGuard('filament')
@@ -55,10 +56,11 @@ class AdminPanelProvider extends PanelProvider
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                AuthenticateSession::class,
+                StartSession::class, // Must come early!
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
+                AdminLang::class, // Now Session is available
+                AuthenticateSession::class, // Depends on session
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,

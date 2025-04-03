@@ -9,16 +9,13 @@ return [
                 'label' => 'إلغاء',
             ],
             'create' => [
-                'label' => 'إضافة',
-            ],
-            'create_another' => [
-                'label' => 'إضافة وبدء إضافة المزيد',
+                'label' => 'حفظ',
             ],
         ],
     ],
     'notifications' => [
         'created' => [
-            'title' => 'تمت الإضافة',
+            'title' => 'تم الإضافة بنجاح',
         ],
     ],
 ];

@@ -29,6 +29,7 @@ class AuthBaseModel extends Authenticatable
     const IMAGEPATH = 'users';
 
     use Notifiable, UploadTrait, HasApiTokens, SmsTrait, SoftDeletes, HasFactory;
+
     protected $hidden = ['password'];
 
     public static function boot()
@@ -106,10 +107,23 @@ class AuthBaseModel extends Authenticatable
         return $this->attributes['country_code'].$this->attributes['phone'];
     }
 
+
     public function getAvatarAttribute()
     {
         $field = $this->getAvatarField();
-        return $this->getImage($this->attributes[$field], static::IMAGEPATH);
+        $imageName = $this->attributes[$field] ?? null;
+
+        return $this->getImageOrDefault($imageName, static::IMAGEPATH);
+    }
+
+    public static function getImageOrDefault($name, $directory)
+    {
+        $imagePath = storage_path("app/public/images/$directory/".$name);
+
+        if (!empty($name) && file_exists($imagePath)) {
+            return asset("storage/images/$directory/".$name);
+        }
+        return asset("storage/images/default.webp");
     }
 
     public function setAvatarAttribute($value)
