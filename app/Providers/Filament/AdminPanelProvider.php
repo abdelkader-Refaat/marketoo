@@ -7,6 +7,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\UserMenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -17,11 +18,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Facades\Filament;
-use Filament\Navigation\UserMenuItem;
-use Illuminate\Support\Facades\App;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -31,6 +28,15 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->userMenuItems([
+                UserMenuItem::make()
+                    ->label('🇺🇸 '.__('filament-panels/layout.lang.en'))
+                    ->url(fn() => url('/admin/switch-lang/en')),
+
+                UserMenuItem::make()
+                    ->label('🇸🇦 '.__('filament-panels/layout.lang.ar'))
+                    ->url(fn() => url('/admin/switch-lang/ar')),
+            ])
             ->login()
             ->authGuard('filament')
             ->colors([
@@ -58,22 +64,11 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class, // Only here, not in both places
+                Authenticate::class,
             ]);
     }
 
     public function boot(): void
     {
-        Filament::serving(function () {
-            App::setLocale(session('locale', 'en')); // ✅ Set locale for Filament
-            Filament::registerUserMenuItems([
-                UserMenuItem::make()
-                    ->label('🇺🇸 English')
-                    ->url(url('/admin/switch-lang/en')),
-                UserMenuItem::make()
-                    ->label('🇸🇦 العربية')
-                    ->url(url('/admin/switch-lang/ar')),
-            ]);
-        });
     }
 }

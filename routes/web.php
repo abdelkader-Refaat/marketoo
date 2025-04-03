@@ -1,27 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
+use App\Http\Controllers\Admin\PublicSettings\SettingController;
+
 
 Route::get('/', function () {
-    return Inertia::render('front/welcome');
+    return Inertia::render('welcome');
 });
-    
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('front/dashboard');
+        return Inertia::render('dashboard');
     })->name('dashboard');
 });
 
-// ✅ Move language switcher outside auth middleware
-Route::get('/switch-lang/{locale}', function ($locale) {
-    if (!in_array($locale, languages())) {
-        abort(400);
-    }
-    Session::put('locale', $locale);
-    App::setLocale($locale);
-    return redirect()->back();
-})->name('switch.lang');
+Route::get('/switch-lang/{lang}',
+    [SettingController::class, 'switchLang'])->name('switch_lang');
+
+
+
+
+
 

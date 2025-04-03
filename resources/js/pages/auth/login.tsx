@@ -25,13 +25,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
-        remember: false,
+        remember: false
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('login'), {
-            onFinish: () => reset('password'),
+        post(route('site.login'), {
+            onFinish: () => reset('password')
         });
     };
 
@@ -61,7 +61,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
                             {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
+                                <TextLink href={route('site.password.request')} className="ml-auto text-sm"
+                                          tabIndex={5}>
                                     Forgot password?
                                 </TextLink>
                             )}
@@ -92,7 +93,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                 <div className="text-muted-foreground text-center text-sm">
                     Don't have an account?{' '}
-                    <TextLink href={route('register')} tabIndex={5}>
+                    <TextLink href={route('site.register')} tabIndex={5}>
                         Sign up
                     </TextLink>
                 </div>

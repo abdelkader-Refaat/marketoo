@@ -9,11 +9,25 @@ use App\Services\Core\SettingService;
 
 class SettingController extends Controller
 {
-    private $settingService;
 
-    public function __construct(SettingService $settingService)
+    public function __construct(private SettingService $settingService)
     {
-        $this->settingService = $settingService;
+    }
+
+    public function switchLang($lang)
+    {
+        if (in_array($lang, languages())) {
+            if (session()->has('lang')) {
+                session()->forget('lang');
+            }
+            session()->put('lang', $lang);
+        } else {
+            if (session()->has('lang')) {
+                session()->forget('lang');
+            }
+            session()->put('lang', 'ar');
+        }
+        return redirect()->back();
     }
 
     public function index()

@@ -21,13 +21,13 @@ export default function Register() {
         name: '',
         email: '',
         password: '',
-        password_confirmation: '',
+        password_confirmation: ''
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        post(route('site.register'), {
+            onFinish: () => reset('password', 'password_confirmation')
         });
     };
 
@@ -109,7 +109,7 @@ export default function Register() {
 
                 <div className="text-muted-foreground text-center text-sm">
                     Already have an account?{' '}
-                    <TextLink href={route('login')} tabIndex={6}>
+                    <TextLink href={route('site.login')} tabIndex={6}>
                         Log in
                     </TextLink>
                 </div>
