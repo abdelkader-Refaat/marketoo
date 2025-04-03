@@ -1,7 +1,14 @@
 <?php
 
 return [
-
-    'breadcrumb' => 'List',
-
+    'actions' => [
+        'create' => [
+            'label' => 'New :label',
+        ],
+    ],
+    'table' => [
+        'search' => [
+            'placeholder' => 'Search...',
+        ],
+    ],
 ];
