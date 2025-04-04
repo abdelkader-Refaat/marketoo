@@ -8,19 +8,19 @@ import { Link } from '@inertiajs/react';
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
-        url: '/settings/profile',
-        icon: null,
+        url: '/site/settings/profile',
+        icon: null
     },
     {
         title: 'Password',
-        url: '/settings/password',
-        icon: null,
+        url: '/site/settings/password',
+        icon: null
     },
     {
         title: 'Appearance',
-        url: '/settings/appearance',
-        icon: null,
-    },
+        url: '/site/settings/appearance',
+        icon: null
+    }
 ];
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
@@ -40,7 +40,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': currentPath === item.url,
+                                    'bg-muted': currentPath === item.url
                                 })}
                             >
                                 <Link href={item.url} prefetch>
