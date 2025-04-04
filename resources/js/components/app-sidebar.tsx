@@ -17,23 +17,19 @@ import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        url: '/dashboard',
+        title: 'settings',
+        url: '/site/settings/profile',
         icon: LayoutGrid
     }
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder
-    },
-    {
-        title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
+        title: 'my Github Repo',
+        url: 'https://github.com/abdelkader-Refaat/marketoo',
         icon: BookOpen
     }
+
 ];
 
 export function AppSidebar() {
@@ -43,7 +39,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href="site/settings/profile" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
