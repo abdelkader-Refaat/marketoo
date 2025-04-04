@@ -12,14 +12,14 @@ class RegisterRequest extends BaseApiRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'max:50'],
-            'avatar' => 'nullable|mimes:'.$this->mimesImage(),
+            'name' => ['required', 'string', 'max:50'],
+            'avatar' => 'nullable|image|mimes:'.$this->mimesImage().'|max:2048',
             'phone' => [
                 'required', 'numeric',
                 Rule::unique('users', 'phone')->whereNull('deleted_at'),
             ],
-            'password' => ['required', 'confirmed', 'string', 'min:6', 'max:50'],
-            'country_code' => 'required|numeric|digits_between:1,5',
+            'password' => ['required', 'confirmed', 'string', 'min:8', 'max:50'],
+            'country_code' => 'required|string|max:5',
             'email' => [
                 'required', 'email:rfc,dns',
                 Rule::unique('users', 'email')->whereNull('deleted_at')

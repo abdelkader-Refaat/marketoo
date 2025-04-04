@@ -16,9 +16,9 @@ Route::group(['middleware' => ['OptionalSanctumMiddleware']], function () {
     // get countries and cities list
     Route::group(['prefix' => 'countries', 'controller' => CountriesCitiesController::class], function () {
         // get countries
-        Route::get('', [CountriesCitiesController::class, 'getCountries']);
+        Route::get('/', 'getCountries');
         // get cities of specific country
-        Route::get('{country_id}/cities', [CountriesCitiesController::class, 'getCountryCities']);
+        Route::get('{country_id}/cities', 'getCountryCities');
     });
     // New Routes here
 });
