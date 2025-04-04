@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
 
         Model::shouldBeStrict(!$this->app->isProduction()); // prevent lazy loading queries
         DB::prohibitDestructiveCommands(!$this->app->isProduction());  // prevent DB:fresh commands
-        
+
         $folders = array_diff(scandir(database_path().'/migrations'), ['..', '.']);
         $this->loadMigrationsFrom(
             array_map(function ($folder) {

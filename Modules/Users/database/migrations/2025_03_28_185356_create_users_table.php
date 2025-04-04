@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name', 50)->nullable();
             $table->string('avatar', 50)->nullable();
-//            $table->string('cover', 50)->nullable();
+            $table->string('cover', 50)->nullable();
             $table->string('country_code', 5)->default('966');
             $table->string('phone', 15);
             $table->string('email', 50)->nullable();
