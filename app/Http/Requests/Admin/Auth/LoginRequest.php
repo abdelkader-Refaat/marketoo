@@ -2,61 +2,72 @@
 
 namespace App\Http\Requests\Admin\Auth;
 
+use app\Http\Requests\Api\V1\BaseApiRequest;
 use Illuminate\Auth\Events\Lockout;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Modules\Users\App\Models\User;
 
-class LoginRequest extends FormRequest
+class LoginRequest extends BaseApiRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'login_type' => ['required', 'in:email,phone'],
+            'identifier' => ['required', 'string'],
+            'country_code' => ['required_if:login_type,phone', 'string'],
             'password' => ['required', 'string'],
+            'remember' => ['boolean'],
         ];
     }
 
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    public function prepareForValidation()
+    {
+        if ($this->login_type === 'phone') {
+            $this->merge([
+                'phone' => fixPhone($this->phone),
+                'country_code' => fixPhone($this->country_code),
+            ]);
+        }
+    }
+
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $credentials = $this->getCredentials();
+        $user = User::when($this->login_type === 'phone',
+            fn($q) => $q->where('phone', $credentials['phone'])
+                ->where('country_code', $credentials['country_code']),
+            fn($q) => $q->where('email', $credentials['email'])
+        )->first();
 
+        if (!$user || !Hash::check($this->password, $user->password)) {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'identifier' => __('auth.failed'),
             ]);
+        }
+
+        // Standard login (no remember token)
+        Auth::login($user);
+
+        // Handle "remember me" via Sanctum token expiration
+        if ($this->boolean('remember')) {
+            $user->createToken('remember-me', expiresAt: now()->addMonth());
         }
 
         RateLimiter::clear($this->throttleKey());
     }
 
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function ensureIsNotRateLimited(): void
     {
         if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
@@ -66,20 +77,32 @@ class LoginRequest extends FormRequest
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
-
         throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
+            'identifier' => __('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
         ]);
     }
 
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('identifier')).'|'.$this->ip());
+    }
+
+    protected function getCredentials(): array
+    {
+        if ($this->input('login_type') === 'phone') {
+            return [
+                'phone' => $this->input('identifier'),
+                'country_code' => $this->input('country_code'),
+                'password' => $this->input('password'),
+            ];
+        }
+
+        return [
+            'email' => $this->input('identifier'),
+            'password' => $this->input('password'),
+        ];
     }
 }

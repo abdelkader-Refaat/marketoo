@@ -8,6 +8,7 @@ return [
         'is_admin' => 'Admin',
         'content' => 'Content',
         'post' => 'Post',
+        'avatar' => 'Avatar',
     ],
     'model' => [
         'single' => 'User',

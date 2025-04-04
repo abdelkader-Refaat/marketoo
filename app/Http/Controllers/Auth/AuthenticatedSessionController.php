@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,14 +22,16 @@ class AuthenticatedSessionController extends Controller
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
+            'defaultCountryCode' => '+966', // Set default country code for Saudi Arabia
         ]);
     }
 
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
+//        dd($request->validated());
         $request->authenticate();
 
         $request->session()->regenerate();
@@ -41,11 +44,23 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        try {
+            $user = $request->user();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            // Sanctum token revocation
+            if (method_exists($user, 'currentAccessToken')) {
+                $user->currentAccessToken()?->delete();
+            }
 
-        return redirect('/');
+            // Web session cleanup
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect('/')->with('status', 'Logged out successfully');
+        } catch (\Exception $e) {
+            \Log::error('Logout error', ['error' => $e->getMessage()]);
+            return redirect('/')->with('error', 'Logout failed. Please try again.');
+        }
     }
 }

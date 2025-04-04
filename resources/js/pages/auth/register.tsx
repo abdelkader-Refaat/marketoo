@@ -1,193 +1,306 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
+import { Head, useForm, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+import InputError from '@/components/input-error';
 import AuthLayout from '@/layouts/auth-layout';
 
-interface RegisterForm {
+interface Country {
+    id: number;
     name: string;
-    email: string;
-    phone: string;
-    country_code: string;
-    country_id: string;
-    city_id: string;
-    password: string;
-    password_confirmation: string;
-    is_accept_terms: boolean;
+    key: string; // country code
+    cities: City[];
+}
+
+interface City {
+    id: number;
+    name: string;
+    country: {
+        id: number;
+        name: string;
+    };
 }
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [cities, setCities] = useState<City[]>([]);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [isLoadingCities, setIsLoadingCities] = useState(false);
+
+    const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
-        phone: '',
-        country_code: '',
-        country_id: '',
-        city_id: '',
         password: '',
         password_confirmation: '',
-        is_accept_terms: false
+        country_id: '',
+        city_id: '',
+        country_code: '',
+        phone: '',
+        is_accept_terms: false,
+        avatar: null
     });
 
-    const submit: FormEventHandler = (e) => {
+    // Load countries on component mount
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await fetch('/api/v1/countries');
+                const result = await response.json();
+                if (result.key === 'success') {
+                    setCountries(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch countries:', error);
+            }
+        };
+
+        fetchCountries();
+    }, []);
+
+    // Load cities when country changes
+    useEffect(() => {
+        const fetchCities = async () => {
+            if (!data.country_id) {
+                setCities([]);
+                return;
+            }
+
+            setIsLoadingCities(true);
+            try {
+                // Check if cities are already loaded with countries
+                const selectedCountry = countries.find(c => c.id.toString() === data.country_id);
+                if (selectedCountry?.cities?.length) {
+                    setCities(selectedCountry.cities);
+                    setIsLoadingCities(false);
+                    return;
+                }
+
+                // Otherwise fetch cities separately
+                const response = await fetch(`/api/v1/countries/${data.country_id}/cities`);
+                const result = await response.json();
+                if (result.key === 'success') {
+                    setCities(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch cities:', error);
+            } finally {
+                setIsLoadingCities(false);
+            }
+        };
+
+        fetchCities();
+
+        // Set country code when country changes
+        if (data.country_id) {
+            const selectedCountry = countries.find(c => c.id.toString() === data.country_id);
+            if (selectedCountry) {
+                setData('country_code', selectedCountry.key);
+            }
+        }
+    }, [data.country_id, countries]);
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('avatar', file);
+            setAvatarPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('site.register'), {
-            onFinish: () => reset('password', 'password_confirmation')
+            preserveScroll: true,
+            onSuccess: () => {
+                setAvatarPreview(null);
+            }
         });
     };
 
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
+        <AuthLayout title="Create Account">
             <Head title="Register" />
-            <form onSubmit={submit} className="space-y-6">
-                <div className="space-y-2">
+            <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Avatar Upload */}
+                <div className="flex flex-col items-center">
+                    {avatarPreview ? (
+                        <img src={avatarPreview} className="w-24 h-24 rounded-full mb-2" alt="Avatar" />
+                    ) : (
+                        <div className="w-24 h-24 rounded-full bg-gray-100 mb-2" />
+                    )}
+                    <Label htmlFor="avatar" className="cursor-pointer">
+                        <span className="text-blue-600">Upload Avatar</span>
+                        <input
+                            id="avatar"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleAvatarChange}
+                        />
+                    </Label>
+                    <InputError message={errors.avatar} />
+                </div>
+
+                {/* Name */}
+                <div>
                     <Label htmlFor="name">Full Name</Label>
                     <Input
                         id="name"
-                        type="text"
-                        required
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
-                        placeholder="John Doe"
+                        required
                     />
                     <InputError message={errors.name} />
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="email">Email address</Label>
+                {/* Email */}
+                <div>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                         id="email"
                         type="email"
-                        required
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        placeholder="email@example.com"
+                        required
                     />
                     <InputError message={errors.email} />
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="phone">Phone number</Label>
-                    <div className="flex space-x-2">
-                        <Input
-                            id="country_code"
-                            type="text"
-                            required
-                            value={data.country_code}
-                            onChange={(e) => setData('country_code', e.target.value)}
-                            placeholder="+1"
-                        />
-                        <Input
-                            id="phone"
-                            type="tel"
-                            required
-                            value={data.phone}
-                            onChange={(e) => setData('phone', e.target.value)}
-                            placeholder="123-456-7890"
-                        />
-                    </div>
-                    <InputError message={errors.phone} />
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="country_id">Country</Label>
+                {/* Country */}
+                <div>
+                    <Label>Country</Label>
                     <Select
-                        id="country_id"
                         value={data.country_id}
-                        onValueChange={(value) => setData('country_id', value)}
+                        onValueChange={(value) => {
+                            setData('country_id', value);
+                            setData('city_id', ''); // Reset city when country changes
+                        }}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder="Select Country" />
+                            <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="1">United States</SelectItem>
-                            <SelectItem value="2">Canada</SelectItem>
+                            {countries.map(country => (
+                                <SelectItem key={country.id} value={country.id.toString()}>
+                                    {country.name} (+{country.key})
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                     <InputError message={errors.country_id} />
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="city_id">City</Label>
+                {/* City */}
+                <div>
+                    <Label>City</Label>
                     <Select
-                        id="city_id"
                         value={data.city_id}
                         onValueChange={(value) => setData('city_id', value)}
+                        disabled={!data.country_id || isLoadingCities}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder="Select City" />
+                            {isLoadingCities ? (
+                                <span className="text-muted-foreground">Loading cities...</span>
+                            ) : data.country_id ? (
+                                <SelectValue placeholder="Select city" />
+                            ) : (
+                                <SelectValue placeholder="Select country first" />
+                            )}
                         </SelectTrigger>
                         <SelectContent>
-                            {data.country_id === '1' && (
-                                <>
-                                    <SelectItem value="1">New York</SelectItem>
-                                    <SelectItem value="2">Los Angeles</SelectItem>
-                                </>
-                            )}
-                            {data.country_id === '2' && (
-                                <>
-                                    <SelectItem value="3">Toronto</SelectItem>
-                                    <SelectItem value="4">Vancouver</SelectItem>
-                                </>
-                            )}
+                            {cities.map(city => (
+                                <SelectItem key={city.id} value={city.id.toString()}>
+                                    {city.name}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                     <InputError message={errors.city_id} />
                 </div>
 
-                <div className="space-y-2">
+                {/* Phone */}
+                <div>
+                    <Label>Phone Number</Label>
+                    <div className="flex gap-2">
+                        <Input
+                            value={data.country_code}
+                            onChange={(e) => setData('country_code', e.target.value)}
+                            className="w-1/4"
+                            placeholder="+966"
+                            readOnly={!!data.country_id}
+                        />
+                        <Input
+                            value={data.phone}
+                            onChange={(e) => setData('phone', e.target.value)}
+                            className="w-3/4"
+                            placeholder="Phone number"
+                        />
+                    </div>
+                    <InputError message={errors.phone} />
+                </div>
+
+                {/* Password */}
+                <div>
                     <Label htmlFor="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        required
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        placeholder="Password"
-                    />
+                    <div className="relative">
+                        <Input
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            value={data.password}
+                            onChange={(e) => setData('password', e.target.value)}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-2 top-2"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
                     <InputError message={errors.password} />
                 </div>
 
-                <div className="space-y-2">
+                {/* Confirm Password */}
+                <div>
                     <Label htmlFor="password_confirmation">Confirm Password</Label>
-                    <Input
-                        id="password_confirmation"
-                        type="password"
-                        required
-                        value={data.password_confirmation}
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        placeholder="Confirm Password"
-                    />
+                    <div className="relative">
+                        <Input
+                            id="password_confirmation"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            value={data.password_confirmation}
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-2 top-2"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
                     <InputError message={errors.password_confirmation} />
                 </div>
 
-                <div className="flex items-center">
-                    <Checkbox
-                        id="is_accept_terms"
-                        checked={data.is_accept_terms}
-                        onCheckedChange={(checked) => setData('is_accept_terms', !!checked)}
-                    />
-                    <Label htmlFor="is_accept_terms">
-                        I accept the terms and conditions
-                    </Label>
-                </div>
-                <InputError message={errors.is_accept_terms} />
 
-                <Button type="submit" className="w-full" disabled={processing}>
-                    {processing ? <LoaderCircle className="animate-spin" /> : 'Create account'}
+                {/* Submit Button */}
+                <Button type="submit" disabled={processing} className="w-full">
+                    {processing && <LoaderCircle className="animate-spin mr-2" />}
+                    Register
                 </Button>
 
-                <div className="text-center text-sm">
+                {/* Login Link */}
+                <div className="text-center">
                     Already have an account?{' '}
-                    <TextLink href={route('site.login')}>
-                        Log in
-                    </TextLink>
+                    <a href={route('site.login')} className="text-blue-600 hover:underline">
+                        Login
+                    </a>
                 </div>
             </form>
         </AuthLayout>

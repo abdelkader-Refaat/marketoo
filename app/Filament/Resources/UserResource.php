@@ -23,6 +23,12 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label(__('users.field.name')),
 
+                Forms\Components\FileUpload::make('avatar')
+                    ->label(__('admin.fields.avatar'))
+                    ->image()
+                    ->directory('user-avatars')
+                    ->nullable(),
+
                 Forms\Components\TextInput::make('email')
                     ->label(__('users.field.email'))
                     ->email()
@@ -48,9 +54,12 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->label(__('users::users.field.avatar'))
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('phone')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('full_phone')->sortable()->searchable(),
                 Tables\Columns\BooleanColumn::make('active')
                     ->label(__('users.field.active')),
                 Tables\Columns\TextColumn::make('created_at')

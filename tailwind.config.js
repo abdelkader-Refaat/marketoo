@@ -1,12 +1,12 @@
 module.exports = {
     content: [
-        './resources/**/*.{html,js,php,vue}',
-        './node_modules/your-package/**/*.js' // if using UI packages
+        './resources/js/**/*.{js,jsx,ts,tsx}',
+        './resources/views/**/*.blade.php'
     ],
     theme: {
         extend: {}
     },
     plugins: [
-        require('tailwindcss-animate') // if using animations
+        require('tailwindcss-animate')
     ]
 };

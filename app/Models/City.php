@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Core\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Users\App\Models\User;
 use Spatie\Translatable\HasTranslations;
 
@@ -18,9 +19,9 @@ class City extends BaseModel
         return $this->hasMany(User::class);
     }
 
-    public function country()
+    public function country(): BelongsTo
     {
-        return $this->belongsTo(Country::class, 'country_id', 'id');
+        return $this->belongsTo(Country::class);
     }
 
 }

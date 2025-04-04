@@ -20,13 +20,17 @@ class CountriesCitiesController extends Controller
 
     public function getCountries(): JsonResponse
     {
-        $data = $this->countryService->all();
+        $data = $this->countryService->all(with: [
+            'cities' => function ($query) {
+                $query->with('country');
+            }
+        ]);
         return $this->jsonResponse(data: CountryResource::collection($data));
     }
 
     public function getCountryCities($country_id): JsonResponse
     {
-        $data = $this->cityService->all(conditions: ['country_id' => $country_id]);
+        $data = $this->cityService->all(conditions: ['country_id' => $country_id], with: ['country.cities']);
         return $this->jsonResponse(data: CityResource::collection($data));
     }
 }

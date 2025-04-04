@@ -34,7 +34,6 @@ return Application::configure(basePath: dirname(__DIR__))
             // API Routes v1
             Route::middleware('api')
                 ->prefix('api/v1')
-                ->name('api.v1.')
                 ->group(function () {
                     require __DIR__.'/../routes/api/v1/api.php';
                     require __DIR__.'/../routes/api/v1/guards/general.php';

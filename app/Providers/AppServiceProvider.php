@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use Exception;
 use App\Models\PublicSettings\Social;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use App\Services\Core\SettingService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Models\PublicSettings\SiteSetting;
@@ -24,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if ($this->app->environment('local')) {
+        if (!$this->app->environment('production')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
@@ -34,10 +36,14 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrap();
         Schema::defaultStringLength(191);
-        $folders = array_diff(scandir(database_path() . '/migrations'), ['..', '.']);
+
+        Model::shouldBeStrict(!$this->app->isProduction()); // prevent lazy loading queries
+        DB::prohibitDestructiveCommands(!$this->app->isProduction());  // prevent DB:fresh commands
+
+        $folders = array_diff(scandir(database_path().'/migrations'), ['..', '.']);
         $this->loadMigrationsFrom(
             array_map(function ($folder) {
-                return database_path() . '/migrations/' . $folder;
+                return database_path().'/migrations/'.$folder;
             }, $folders)
         );
 
@@ -49,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
                 return Social::get();
             });
         } catch (Exception $e) {
-            echo ('app service provider exception :::::::::: ' . $e->getMessage());
+            echo('app service provider exception :::::::::: '.$e->getMessage());
         }
 
         view()->composer('admin.*', function ($view) {
