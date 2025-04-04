@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 
+@plugin 'tailwindcss-animate';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -7,159 +8,151 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Instrument Sans', var(--font-sans);
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --radius: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-md: 0.5rem;
-    --radius-sm: 0.25rem;
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
 
-    /* Modern E-commerce Color Palette */
-    --color-primary: 25 91 255;    /* Vibrant blue */
-    --color-primary-foreground: 255 255 255;
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
 
-    --color-secondary: 255 152 0;  /* Orange accent */
-    --color-secondary-foreground: 0 0 0;
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
 
-    --color-accent: 124 58 237;    /* Purple accent */
-    --color-accent-foreground: 255 255 255;
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
 
-    --color-destructive: 239 68 68;
-    --color-destructive-foreground: 255 255 255;
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
 
-    --color-success: 16 185 129;
-    --color-success-foreground: 255 255 255;
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
 
-    --color-warning: 245 158 11;
-    --color-warning-foreground: 0 0 0;
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
 
-    --color-info: 59 130 246;
-    --color-info-foreground: 255 255 255;
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
 
-    /* Backgrounds */
-    --color-background: 250 250 250;
-    --color-foreground: 10 10 10;
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
 
-    --color-card: 255 255 255;
-    --color-card-foreground: 10 10 10;
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
 
-    --color-popover: 255 255 255;
-    --color-popover-foreground: 10 10 10;
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
 
-    --color-muted: 245 245 245;
-    --color-muted-foreground: 115 115 115;
-
-    /* Borders & Inputs */
-    --color-border: 229 229 229;
-    --color-input: 229 229 229;
-    --color-ring: 59 130 246;
-
-    /* Special E-commerce Colors */
-    --color-sale: 239 68 68;       /* Sale tags */
-    --color-featured: 16 185 129;  /* Featured items */
-    --color-new: 59 130 246;       /* New arrivals */
-    /* Charts */
-    --color-chart-1: 25 91 255;    /* Primary blue */
-    --color-chart-2: 255 152 0;    /* Secondary orange */
-    --color-chart-3: 124 58 237;   /* Accent purple */
-    --color-chart-4: 16 185 129;   /* Success green */
-    --color-chart-5: 239 68 68;    /* Destructive red */
-    /* Sidebar */
-    --color-sidebar: 10 10 10;
-    --color-sidebar-foreground: 250 250 250;
-    --color-sidebar-primary: 25 91 255;
-    --color-sidebar-primary-foreground: 255 255 255;
-    --color-sidebar-accent: 124 58 237;
-    --color-sidebar-accent-foreground: 255 255 255;
-    --color-sidebar-border: 38 38 38;
-    --color-sidebar-ring: 59 130 246;
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Dark Mode Theme */
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+:root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.87 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.87 0 0);
+}
+
 .dark {
-    --color-background: 10 10 10;
-    --color-foreground: 250 250 250;
-
-    --color-card: 23 23 23;
-    --color-card-foreground: 250 250 250;
-
-    --color-popover: 23 23 23;
-    --color-popover-foreground: 250 250 250;
-
-    --color-muted: 38 38 38;
-    --color-muted-foreground: 163 163 163;
-
-    --color-border: 38 38 38;
-    --color-input: 38 38 38;
-    --color-ring: 59 130 246;
-
-    /* Dark mode adjustments */
-    --color-primary: 55 125 255; /* Lighter blue for better visibility */
-    --color-secondary: 255 183 77; /* Softer orange */
-    --color-accent: 149 104 251; /* Brighter purple */
-
-    /* Sidebar */
-    --color-sidebar: 23 23 23;
-    --color-sidebar-foreground: 250 250 250;
-    --color-sidebar-border: 64 64 64;
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.145 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.145 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.985 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.396 0.141 25.723);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: oklch(0.269 0 0);
+    --input: oklch(0.269 0 0);
+    --ring: oklch(0.439 0 0);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.985 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(0.269 0 0);
+    --sidebar-ring: oklch(0.439 0 0);
 }
 
-/* Base Styles */
 @layer base {
     * {
         @apply border-border;
     }
 
     body {
-        @apply bg-background text-foreground font-sans antialiased;
-    }
-
-    h1, h2, h3, h4 {
-        @apply font-display;
-    }
-
-    /* Smooth transitions for theme changes */
-    :root {
-        @apply transition-colors duration-200;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        @apply w-2 h-2;
-    }
-
-    ::-webkit-scrollbar-track {
-        @apply bg-muted;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        @apply bg-primary rounded-full;
-    }
-
-    .dark ::-webkit-scrollbar-thumb {
-        @apply bg-primary/80;
-    }
-}
-
-/* Component Extensions */
-@layer components {
-
-
-}
-
-/* Utilities */
-@layer utilities {
-    .text-balance {
-        text-wrap: balance;
-    }
-
-    /* For product price styling */
-    .price-original {
-        @apply text-muted-foreground line-through;
-    }
-
-    .price-sale {
-        @apply text-sale font-bold;
+        @apply bg-background text-foreground;
     }
 }

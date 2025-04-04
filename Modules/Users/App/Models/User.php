@@ -39,6 +39,19 @@ class User extends AuthBaseModel
         return $this->morphMany(PaymentTransaction::class, 'payer');
     }
 
+    public function findForPassport($identifier)
+    {
+        // First try to find by email
+        $user = $this->where('email', $identifier)->first();
+
+        // If not found by email, try by phone
+        if (!$user && filter_var($identifier, FILTER_VALIDATE_EMAIL) === false) {
+            $user = $this->where('phone', $identifier)->first();
+        }
+
+        return $user;
+    }
+
     protected function casts(): array
     {
         return [
