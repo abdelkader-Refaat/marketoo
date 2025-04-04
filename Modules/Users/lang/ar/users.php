@@ -8,6 +8,7 @@ return [
         'is_admin' => 'الادمن',
         'content' => 'المحتوى',
         'post' => 'منشور',
+        'avatar' => 'صورة',
     ],
     'model' => [
         'single' => 'مستخدم',

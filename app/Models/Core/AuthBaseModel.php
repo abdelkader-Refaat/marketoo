@@ -11,6 +11,7 @@ use App\Models\Wallet\Wallet;
 use App\Models\Chat\RoomMember;
 use App\Services\Sms\SmsService;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PublicSettings\Device;
@@ -100,9 +101,13 @@ class AuthBaseModel extends Authenticatable
         }
     }
 
-    public function getFullPhoneAttribute()
+    public function getFullPhoneAttribute(): string
     {
-        return $this->attributes['country_code'].$this->attributes['phone'];
+        return Str::of($this->attributes['country_code'])
+            ->start('+')
+            ->append(' ')
+            ->append($this->attributes['phone'])
+            ->toString();
     }
 
 

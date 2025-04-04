@@ -41,15 +41,9 @@ class User extends AuthBaseModel
 
     public function findForPassport($identifier)
     {
-        // First try to find by email
-        $user = $this->where('email', $identifier)->first();
-
-        // If not found by email, try by phone
-        if (!$user && filter_var($identifier, FILTER_VALIDATE_EMAIL) === false) {
-            $user = $this->where('phone', $identifier)->first();
-        }
-
-        return $user;
+        return self::where('phone', $identifier)
+            ->orWhere('email', $identifier)
+            ->first();
     }
 
     protected function casts(): array

@@ -46,22 +46,21 @@ class AuthenticatedSessionController extends Controller
     {
         try {
             $user = $request->user();
+
+            // Sanctum token revocation
+            if (method_exists($user, 'currentAccessToken')) {
+                $user->currentAccessToken()?->delete();
+            }
+
+            // Web session cleanup
             Auth::guard('web')->logout();
-            $request->session()->flush();
-            $request->session()->regenerate();
+            $request->session()->invalidate();
             $request->session()->regenerateToken();
-            $cookie = Cookie::forget(Auth::getRecallerName());
-            return redirect('/')
-                ->withCookie($cookie)
-                ->with('status', 'You have been successfully logged out.');
+
+            return redirect('/')->with('status', 'Logged out successfully');
         } catch (\Exception $e) {
-            // Log detailed error for debugging
-            \Log::error('Logout failed for user ID: '.optional($user)->id, [
-                'error' => $e->getMessage(),
-                'stack' => $e->getTraceAsString()
-            ]);
-            return redirect('/')
-                ->with('error', 'We encountered an issue logging you out. Please try again.');
+            \Log::error('Logout error', ['error' => $e->getMessage()]);
+            return redirect('/')->with('error', 'Logout failed. Please try again.');
         }
     }
 }

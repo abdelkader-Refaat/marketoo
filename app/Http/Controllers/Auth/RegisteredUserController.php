@@ -16,7 +16,7 @@ class RegisteredUserController extends Controller
         $user = User::create($request->validated());
 
         if ($request->hasFile('avatar')) {
-            $user->avatar_path = $request->file('avatar')->store('avatars');
+            $user->avatar = $request->file('avatar');
             $user->save();
         }
 

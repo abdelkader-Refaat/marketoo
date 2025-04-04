@@ -144,7 +144,7 @@ export default function Login({ status, canResetPassword, defaultCountryCode }: 
 
                     <div className="text-center text-sm">
                         Don't have an account?{' '}
-                        <TextLink href={route('register')}>
+                        <TextLink href={route('site.register')}>
                             Sign up
                         </TextLink>
                     </div>

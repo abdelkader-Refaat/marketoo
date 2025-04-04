@@ -19,7 +19,7 @@ class RegisterRequest extends BaseApiRequest
                 Rule::unique('users', 'phone')->whereNull('deleted_at'),
             ],
             'password' => ['required', 'confirmed', 'string', 'min:8', 'max:50'],
-            'country_code' => 'required|string|max:5',
+            'country_code' => 'required|string|max:5|exists:countries,key',
             'email' => [
                 'required', 'email:rfc,dns',
                 Rule::unique('users', 'email')->whereNull('deleted_at')
@@ -32,6 +32,8 @@ class RegisterRequest extends BaseApiRequest
     public function prepareForValidation()
     {
         $this->merge([
+            'phone' => fixPhone($this->phone),
+            'country_code' => fixPhone($this->country_code),
             'is_accept_terms' => filter_var($this->is_accept_terms, FILTER_VALIDATE_BOOLEAN),
         ]);
     }
