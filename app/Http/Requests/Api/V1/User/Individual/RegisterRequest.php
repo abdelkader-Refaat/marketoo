@@ -26,7 +26,6 @@ class RegisterRequest extends BaseApiRequest
             ],
             'country_id' => ['required', Rule::exists('countries', 'id')],
             'city_id' => ['required', Rule::exists('cities', 'id')->where('country_id', $this->country_id)],
-            'is_accept_terms' => ['required', 'accepted'],
         ];
     }
 

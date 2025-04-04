@@ -20,7 +20,11 @@ class CountriesCitiesController extends Controller
 
     public function getCountries(): JsonResponse
     {
-        $data = $this->countryService->all();
+        $data = $this->countryService->all(with: [
+            'cities' => function ($query) {
+                $query->with('country');
+            }
+        ]);
         return $this->jsonResponse(data: CountryResource::collection($data));
     }
 

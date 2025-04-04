@@ -5,20 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import InputError from '@/components/input-error';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface Country {
-    id: string;
+    id: number;
     name: string;
-    code: string;
-    cities?: City[]; // Make cities optional since we might fetch them separately
+    key: string; // country code
+    cities: City[];
 }
 
 interface City {
-    id: string;
+    id: number;
     name: string;
+    country: {
+        id: number;
+        name: string;
+    };
 }
 
 export default function Register() {
@@ -44,41 +47,62 @@ export default function Register() {
 
     // Load countries on component mount
     useEffect(() => {
-        router.get('/api/v1/countries', {}, {
-            onSuccess: (data) => setCountries(data.props.countries || []),
-            preserveState: true
-        });
+        const fetchCountries = async () => {
+            try {
+                const response = await fetch('/api/v1/countries');
+                const result = await response.json();
+                if (result.key === 'success') {
+                    setCountries(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch countries:', error);
+            }
+        };
+
+        fetchCountries();
     }, []);
 
     // Load cities when country changes
     useEffect(() => {
-        if (data.country_id) {
-            setIsLoadingCities(true);
-            const selectedCountry = countries.find(c => c.id === data.country_id);
+        const fetchCities = async () => {
+            if (!data.country_id) {
+                setCities([]);
+                return;
+            }
 
-            // If cities are already included with countries, use them
-            if (selectedCountry?.cities) {
-                setCities(selectedCountry.cities);
+            setIsLoadingCities(true);
+            try {
+                // Check if cities are already loaded with countries
+                const selectedCountry = countries.find(c => c.id.toString() === data.country_id);
+                if (selectedCountry?.cities?.length) {
+                    setCities(selectedCountry.cities);
+                    setIsLoadingCities(false);
+                    return;
+                }
+
+                // Otherwise fetch cities separately
+                const response = await fetch(`/api/v1/countries/${data.country_id}/cities`);
+                const result = await response.json();
+                if (result.key === 'success') {
+                    setCities(result.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch cities:', error);
+            } finally {
                 setIsLoadingCities(false);
             }
-            // Otherwise fetch cities separately
-            else {
-                router.get(`/api/v1/countries/${data.country_id}/cities`, {}, {
-                    onSuccess: (data) => {
-                        setCities(data.props.cities || []);
-                        setIsLoadingCities(false);
-                    },
-                    onError: () => setIsLoadingCities(false)
-                });
-            }
+        };
 
-            // Set country code
-            setData('country_code', selectedCountry?.code || '');
-        } else {
-            setCities([]);
-            setData('city_id', '');
+        fetchCities();
+
+        // Set country code when country changes
+        if (data.country_id) {
+            const selectedCountry = countries.find(c => c.id.toString() === data.country_id);
+            if (selectedCountry) {
+                setData('country_code', selectedCountry.key);
+            }
         }
-    }, [data.country_id]);
+    }, [data.country_id, countries]);
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -93,7 +117,6 @@ export default function Register() {
         post(route('site.register'), {
             preserveScroll: true,
             onSuccess: () => {
-                // Reset form on successful registration
                 setAvatarPreview(null);
             }
         });
@@ -153,15 +176,18 @@ export default function Register() {
                     <Label>Country</Label>
                     <Select
                         value={data.country_id}
-                        onValueChange={(value) => setData('country_id', value)}
+                        onValueChange={(value) => {
+                            setData('country_id', value);
+                            setData('city_id', ''); // Reset city when country changes
+                        }}
                     >
                         <SelectTrigger>
                             <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
                             {countries.map(country => (
-                                <SelectItem key={country.id} value={country.id}>
-                                    {country.name}
+                                <SelectItem key={country.id} value={country.id.toString()}>
+                                    {country.name} (+{country.key})
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -180,13 +206,15 @@ export default function Register() {
                         <SelectTrigger>
                             {isLoadingCities ? (
                                 <span className="text-muted-foreground">Loading cities...</span>
+                            ) : data.country_id ? (
+                                <SelectValue placeholder="Select city" />
                             ) : (
-                                <SelectValue placeholder={data.country_id ? 'Select city' : 'Select country first'} />
+                                <SelectValue placeholder="Select country first" />
                             )}
                         </SelectTrigger>
                         <SelectContent>
                             {cities.map(city => (
-                                <SelectItem key={city.id} value={city.id}>
+                                <SelectItem key={city.id} value={city.id.toString()}>
                                     {city.name}
                                 </SelectItem>
                             ))}
@@ -203,7 +231,7 @@ export default function Register() {
                             value={data.country_code}
                             onChange={(e) => setData('country_code', e.target.value)}
                             className="w-1/4"
-                            placeholder="+1"
+                            placeholder="+966"
                             readOnly={!!data.country_id}
                         />
                         <Input
@@ -260,16 +288,6 @@ export default function Register() {
                     <InputError message={errors.password_confirmation} />
                 </div>
 
-                {/* Terms Checkbox */}
-                <div className="flex items-center space-x-2">
-                    <Checkbox
-                        id="terms"
-                        checked={data.is_accept_terms}
-                        onCheckedChange={(checked) => setData('is_accept_terms', !!checked)}
-                    />
-                    <Label htmlFor="terms">I accept the terms and conditions</Label>
-                </div>
-                <InputError message={errors.is_accept_terms} />
 
                 {/* Submit Button */}
                 <Button type="submit" disabled={processing} className="w-full">
