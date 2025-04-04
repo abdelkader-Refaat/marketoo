@@ -4,7 +4,6 @@ namespace Modules\Users\App\Models;
 
 use App\Models\Core\AuthBaseModel;
 use App\Models\PaymentTransaction;
-use App\Models\PublicSettings\Role;
 use App\Traits\Admin\Users\RelationsTrait;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
