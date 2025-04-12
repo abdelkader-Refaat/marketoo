@@ -14,17 +14,18 @@ class PostsServiceProvider extends ServiceProvider
     use PathNamespace;
 
     protected string $name = 'Posts';
-
     protected string $nameLower = 'posts';
 
-    /**
-     * Boot the application events.
-     */
     public function boot(): void
     {
+        // Set the locale directly without a Closure
+        $locale = session('locale', config('app.locale'));
+        app()->setLocale($locale);
+
         Filament::serving(function () {
-            app()->setLocale(session('locale', config('app.locale')));
+            // If additional Filament-specific logic is needed, add it here without session interaction
         });
+
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();
@@ -34,26 +35,11 @@ class PostsServiceProvider extends ServiceProvider
         $this->registerTranslations();
     }
 
-    /**
-     * Register the service provider.
-     */
-    public function register(): void
-    {
-        $this->app->register(EventServiceProvider::class);
-        $this->app->register(RouteServiceProvider::class);
-    }
-
-    /**
-     * Register commands in the format of Command::class
-     */
     protected function registerCommands(): void
     {
         // $this->commands([]);
     }
 
-    /**
-     * Register command Schedules.
-     */
     protected function registerCommandSchedules(): void
     {
         // $this->app->booted(function () {
@@ -62,10 +48,7 @@ class PostsServiceProvider extends ServiceProvider
         // });
     }
 
-    /**
-     * Register translations.
-     */
-    public function registerTranslations(): void
+    protected function registerTranslations(): void
     {
         $langPath = app_path('Modules/Posts/lang/'.$this->nameLower);
 
@@ -78,9 +61,6 @@ class PostsServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register config.
-     */
     protected function registerConfig(): void
     {
         $relativeConfigPath = config('modules.paths.generator.config.path');
@@ -91,8 +71,9 @@ class PostsServiceProvider extends ServiceProvider
 
             foreach ($iterator as $file) {
                 if ($file->isFile() && $file->getExtension() === 'php') {
-                    $relativePath = str_replace($configPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
-                    $configKey = $this->nameLower . '.' . str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''], $relativePath);
+                    $relativePath = str_replace($configPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                    $configKey = $this->nameLower.'.'.str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''],
+                            $relativePath);
                     $key = ($relativePath === 'config.php') ? $this->nameLower : $configKey;
 
                     $this->publishes([$file->getPathname() => config_path($relativePath)], 'config');
@@ -102,9 +83,6 @@ class PostsServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register views.
-     */
     public function registerViews(): void
     {
         $viewPath = resource_path('views/modules/'.$this->nameLower);
@@ -114,16 +92,9 @@ class PostsServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        $componentNamespace = $this->module_namespace($this->name, $this->app_path(config('modules.paths.generator.component-class.path')));
+        $componentNamespace = $this->module_namespace($this->name,
+            $this->app_path(config('modules.paths.generator.component-class.path')));
         Blade::componentNamespace($componentNamespace, $this->nameLower);
-    }
-
-    /**
-     * Get the services provided by the provider.
-     */
-    public function provides(): array
-    {
-        return [];
     }
 
     private function getPublishableViewPaths(): array
@@ -136,5 +107,16 @@ class PostsServiceProvider extends ServiceProvider
         }
 
         return $paths;
+    }
+
+    public function register(): void
+    {
+        $this->app->register(EventServiceProvider::class);
+        $this->app->register(RouteServiceProvider::class);
+    }
+
+    public function provides(): array
+    {
+        return [];
     }
 }

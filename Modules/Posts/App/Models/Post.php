@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\Posts\App\Models;
+
 //use Laravel\Scout\Searchable;
 //use Abbasudo\Purity\Traits\Sortable;
 //use Abbasudo\Purity\Traits\Filterable;
@@ -15,21 +16,26 @@ use Spatie\Translatable\HasTranslations;
 
 class Post extends BaseModel
 {
-    use HasFactory, Sluggable ,HasTranslations;
+    use HasFactory, Sluggable, HasTranslations;
 
     protected $table = 'posts';
     protected $casts = [
         'privacy' => PostPrivacyEnum::class,
     ];
-    protected static function newFactory()
-    {
-        return PostFactory::new();
-    }
-    protected $fillable = ['user_id', 'title', 'content', 'privacy', 'slug', 'is_promoted', 'event_name', 'event_date_time', 'event_description', 'repost_id', 'repost_text'];
+    protected $fillable = [
+        'user_id', 'title', 'content', 'privacy', 'slug', 'is_promoted', 'event_name', 'event_date_time',
+        'event_description', 'repost_id', 'repost_text'
+    ];
     protected $translatable = [
         'title',
         'content',
     ];
+
+    protected static function newFactory()
+    {
+        return PostFactory::new();
+    }
+
     public function sluggable(): array
     {
         return [
@@ -38,10 +44,12 @@ class Post extends BaseModel
             ],
         ];
     }
-    public function user()
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
+
     public function repost(): BelongsTo
     {
         return $this->belongsTo(self::class, 'repost_id');
