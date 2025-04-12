@@ -5,7 +5,9 @@ namespace Modules\Users\App\Models;
 use App\Models\Core\AuthBaseModel;
 use App\Models\PaymentTransaction;
 use App\Traits\Admin\Users\RelationsTrait;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Posts\App\Models\Post;
 
 class User extends AuthBaseModel
 {
@@ -44,6 +46,11 @@ class User extends AuthBaseModel
         return self::where('phone', $identifier)
             ->orWhere('email', $identifier)
             ->first();
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
     }
 
     protected function casts(): array
