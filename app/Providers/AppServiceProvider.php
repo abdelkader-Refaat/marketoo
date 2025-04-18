@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if (!$this->app->environment('production')) {
+        if (!$this->app->isProduction()) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
@@ -36,9 +36,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrap();
         Schema::defaultStringLength(191);
-
+        Model::automaticallyEagerLoadRelationships();  // laravel 12 latest using eager load all relations rather than use load and with for model relations to avoid n+1 problem
         Model::shouldBeStrict(!$this->app->isProduction()); // prevent lazy loading queries
-        DB::prohibitDestructiveCommands(!$this->app->isProduction());  // prevent DB:fresh commands
+        DB::prohibitDestructiveCommands($this->app->isProduction());  // prevent DB:fresh commands
 
         $folders = array_diff(scandir(database_path().'/migrations'), ['..', '.']);
         $this->loadMigrationsFrom(
