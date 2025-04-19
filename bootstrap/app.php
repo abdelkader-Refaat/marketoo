@@ -6,11 +6,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -36,8 +36,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('api/v1')
                 ->group(function () {
                     require __DIR__.'/../routes/api/v1/api.php';
-                    require __DIR__.'/../routes/api/v1/guards/general.php';
-                    require __DIR__.'/../routes/api/v1/guards/user.php';
+                    // handle refix for general apis .
+                    Route::prefix('general')
+                        ->group(function () {
+                            require __DIR__.'/../routes/api/v1/guards/general.php';
+                        });
+                    // Individual user API routes with prefix
+                    Route::prefix('individual-user')
+                        ->group(function () {
+                            require __DIR__.'/../routes/api/v1/guards/user.php';
+                        });
                 });
         },
     )
@@ -51,7 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         ]);
 
-        // Named Middleware
+        // Named Middleware - unchanged
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
             'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
@@ -78,9 +86,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'ability' => CheckForAnyAbility::class,
             'inertia' => \App\Http\Middleware\HandleInertiaRequests::class,
             'filament' => \App\Http\Middleware\RedirectIfNotFilamentAdmin::class,
-
         ]);
-        // Middleware Groups
+
+        // Middleware Groups - unchanged
         $middleware->group('web', [
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
@@ -94,14 +102,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->group('auth', [
             \App\Http\Middleware\Authenticate::class,
-//            \App\Http\Middleware\EnsureEmailIsVerified::class,
+            //            \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
 
         $middleware->group('api', [
             'throttle:60,1',
             \App\Http\Middleware\Api\ApiLang::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\Api\ApiCors::class
+            \App\Http\Middleware\Api\ApiCors::class,
         ]);
 
         $middleware->priority([
@@ -109,6 +117,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Exception handlers - unchanged
         $exceptions->render(function (ModelNotFoundException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
@@ -119,10 +128,10 @@ return Application::configure(basePath: dirname(__DIR__))
                         'error' => true,
                         'validation_errors' => [
                             'line' => $e->getLine(),
-                            'file' => $e->getFile()
+                            'file' => $e->getFile(),
                         ],
                     ],
-                    'data' => []
+                    'data' => [],
                 ], ResponseAlias::HTTP_NOT_FOUND);
             }
         });
@@ -137,10 +146,10 @@ return Application::configure(basePath: dirname(__DIR__))
                         'error' => true,
                         'validation_errors' => [
                             'line' => $e->getLine(),
-                            'file' => $e->getFile()
+                            'file' => $e->getFile(),
                         ],
                     ],
-                    'data' => []
+                    'data' => [],
                 ], ResponseAlias::HTTP_NOT_FOUND);
             }
         });
@@ -155,7 +164,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         'error' => true,
                         'validation_errors' => [],
                     ],
-                    'data' => []
+                    'data' => [],
                 ], ResponseAlias::HTTP_UNAUTHORIZED);
             }
         });
@@ -170,10 +179,10 @@ return Application::configure(basePath: dirname(__DIR__))
                         'error' => true,
                         'validation_errors' => [
                             'line' => $e->getLine(),
-                            'file' => $e->getFile()
+                            'file' => $e->getFile(),
                         ],
                     ],
-                    'data' => []
+                    'data' => [],
                 ], ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
             }
         });
@@ -181,6 +190,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Error|Exception $e, Request $request) {
             if ($request->is('api/*')) {
                 $code = property_exists($e, 'status') ? $e->status : ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
+
                 return response()->json([
                     'key' => 'fail',
                     'code' => $code,
@@ -189,10 +199,10 @@ return Application::configure(basePath: dirname(__DIR__))
                         'error' => true,
                         'validation_errors' => [
                             'line' => $e->getLine(),
-                            'file' => $e->getFile()
+                            'file' => $e->getFile(),
                         ],
                     ],
-                    'data' => []
+                    'data' => [],
                 ], $code);
             }
         });

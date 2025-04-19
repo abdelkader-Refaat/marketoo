@@ -8,7 +8,6 @@ use Closure;
 
 class ApiLang
 {
-
     public function handle($request, Closure $next)
     {
         $lang = defaultLang();
@@ -21,6 +20,7 @@ class ApiLang
 
         App::setLocale($lang);
         Carbon::setLocale($lang);
+
         return $next($request);
     }
 }

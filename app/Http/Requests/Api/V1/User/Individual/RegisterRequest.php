@@ -3,9 +3,9 @@
 namespace App\Http\Requests\Api\V1\User\Individual;
 
 use App\Http\Requests\Api\V1\BaseApiRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends BaseApiRequest
 {
@@ -22,7 +22,7 @@ class RegisterRequest extends BaseApiRequest
             'country_code' => 'required|string|max:5|exists:countries,key',
             'email' => [
                 'required', 'email:rfc,dns',
-                Rule::unique('users', 'email')->whereNull('deleted_at')
+                Rule::unique('users', 'email')->whereNull('deleted_at'),
             ],
             'country_id' => ['required', Rule::exists('countries', 'id')],
             'city_id' => ['required', Rule::exists('cities', 'id')->where('country_id', $this->country_id)],

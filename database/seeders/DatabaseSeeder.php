@@ -22,6 +22,7 @@ use Database\Seeders\public_settings\SocialTableSeeder;
 use Illuminate\Database\Seeder;
 use Modules\Admins\Database\Seeders\AdminsDatabaseSeeder;
 use Modules\Posts\Database\Seeders\PostsDatabaseSeeder;
+use Modules\Providers\Database\Seeders\ProvidersDatabaseSeeder;
 use Modules\Users\Database\Seeders\UsersDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -39,6 +40,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionTableSeeder::class);
 
         $this->call(UsersDatabaseSeeder::class);
+        $this->call(ProvidersDatabaseSeeder::class);
         $this->call(PostsDatabaseSeeder::class);
         $this->call(IntroHowWorkTableSeeder::class);
         $this->call(IntroSliderTableSeeder::class);

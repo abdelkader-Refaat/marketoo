@@ -2,32 +2,30 @@
 
 namespace App\Models\Core;
 
-use Carbon\Carbon;
 use App\Mail\SendCode;
-use App\Traits\SmsTrait;
 use App\Models\Chat\Room;
-use App\Traits\UploadTrait;
-use App\Models\Wallet\Wallet;
 use App\Models\Chat\RoomMember;
+use App\Models\PublicSections\Complaint;
+use App\Models\PublicSections\ComplaintReplay;
+use App\Models\PublicSettings\Device;
+use App\Models\Wallet\Wallet;
 use App\Services\Sms\SmsService;
+use App\Traits\SmsTrait;
+use App\Traits\UploadTrait;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Facades\Mail;
-use App\Models\PublicSettings\Device;
-use App\Models\PublicSections\Complaint;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\PublicSections\ComplaintReplay;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class AuthBaseModel extends Authenticatable
 {
-    const IMAGEPATH = 'users';
-
-    use Notifiable, UploadTrait, HasApiTokens, SmsTrait, SoftDeletes, HasFactory;
+    use HasApiTokens, HasFactory, Notifiable, SmsTrait, SoftDeletes, UploadTrait;
 
     protected $hidden = ['password'];
 
@@ -37,7 +35,7 @@ class AuthBaseModel extends Authenticatable
         /* creating, created, updating, updated, deleting, deleted, forceDeleted, restored */
         static::deleted(function ($model) {
             $field = $model->getAvatarField();
-            if (!empty($model->attributes[$field])) {
+            if (! empty($model->attributes[$field])) {
                 $model->deleteFile($model->attributes[$field], self::IMAGEPATH);
             }
         });
@@ -54,6 +52,7 @@ class AuthBaseModel extends Authenticatable
         if (Schema::hasColumn($this->getTable(), 'avatar')) {
             return 'avatar';
         }
+
         return 'image';
     }
 
@@ -63,40 +62,41 @@ class AuthBaseModel extends Authenticatable
             if ($searchArray) {
                 foreach ($searchArray as $key => $value) {
                     if (str_contains($key, '_id')) {
-                        if (null != $value) {
+                        if ($value != null) {
                             $query->Where($key, $value);
                         }
-                    } elseif ('order' == $key) {
-                    } elseif ('created_at_min' == $key) {
-                        if (null != $value) {
+                    } elseif ($key == 'order') {
+                    } elseif ($key == 'created_at_min') {
+                        if ($value != null) {
                             $query->WhereDate('created_at', '>=', Carbon::createFromFormat('m-d-Y', $value));
                         }
-                    } elseif ('created_at_max' == $key) {
-                        if (null != $value) {
+                    } elseif ($key == 'created_at_max') {
+                        if ($value != null) {
                             $query->WhereDate('created_at', '<=', Carbon::createFromFormat('m-d-Y', $value));
                         }
                     } else {
-                        if (null != $value) {
+                        if ($value != null) {
                             $query->Where($key, 'like', '%'.$value.'%');
                         }
                     }
                 }
             }
         });
+
         return $query->orderBy('id',
             request()->searchArray && request()->searchArray['order'] ? request()->searchArray['order'] : 'DESC');
     }
 
     public function setPhoneAttribute($value)
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             $this->attributes['phone'] = fixPhone($value);
         }
     }
 
     public function setCountryCodeAttribute($value)
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             $this->attributes['country_code'] = fixPhone($value);
         }
     }
@@ -110,7 +110,6 @@ class AuthBaseModel extends Authenticatable
             ->toString();
     }
 
-
     public function getAvatarAttribute()
     {
         $field = $this->getAvatarField();
@@ -123,16 +122,17 @@ class AuthBaseModel extends Authenticatable
     {
         $imagePath = storage_path("app/public/images/$directory/".$name);
 
-        if (!empty($name) && file_exists($imagePath)) {
+        if (! empty($name) && file_exists($imagePath)) {
             return asset("storage/images/$directory/".$name);
         }
-        return asset("storage/images/default.webp");
+
+        return asset('storage/images/default.webp');
     }
 
     public function setAvatarAttribute($value)
     {
         $field = $this->getAvatarField();
-        if (null != $value && is_file($value)) {
+        if ($value != null && is_file($value)) {
             if (isset($this->attributes[$field])) {
                 $this->deleteFile($this->attributes[$field], static::IMAGEPATH);
             }
@@ -148,6 +148,7 @@ class AuthBaseModel extends Authenticatable
     public function markAsActive()
     {
         $this->update(['code' => null, 'code_expire' => null, 'active' => true]);
+
         return $this;
     }
 
@@ -158,6 +159,7 @@ class AuthBaseModel extends Authenticatable
             'code_expire' => Carbon::now()->addMinute(),
         ]);
         $this->sendCodeAtSms($this->code);
+
         return ['user' => $this];
     }
 
@@ -169,7 +171,7 @@ class AuthBaseModel extends Authenticatable
 
     public function sendCodeAtSms($code, $full_phone = null): void
     {
-        (new SmsService())->sendSms($full_phone ?? $this->full_phone, trans('api.activeCode').$code);
+        (new SmsService)->sendSms($full_phone ?? $this->full_phone, trans('api.activeCode').$code);
     }
 
     public function sendCodeAtEmail($code, $email = null): void
@@ -186,7 +188,7 @@ class AuthBaseModel extends Authenticatable
         // $this->tokens()->delete();
         $this->updateDevice();
         $this->updateLang();
-        if (!$this['parent_id']) {
+        if (! $this['parent_id']) {
             $token = $this->createToken(request()->device_type)->plainTextToken;
         } else {
             $token = $this->getAbilitiesAndSetTokenAbility($this, request()->device_type);
@@ -236,6 +238,7 @@ class AuthBaseModel extends Authenticatable
         if (request()->device_id) {
             $this->devices()->where(['device_id' => request()->device_id])->delete();
         }
+
         return true;
     }
 

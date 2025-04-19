@@ -15,10 +15,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::get('/switch-lang/{lang}',
-    [SettingController::class, 'switchLang'])->name('switch_lang');
+Route::get('/switch-lang/{lang}', [SettingController::class, 'switchLang'])->name('switch_lang');
 
-
+Route::get('testing/function', \App\Http\Controllers\TestingController::class);
 
 
 

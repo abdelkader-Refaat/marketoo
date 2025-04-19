@@ -2,7 +2,6 @@
 
 namespace App\Services\Core;
 
-
 use App\Models\Core\Page;
 use App\Models\PublicSettings\SiteSetting;
 use App\Traits\ReportTrait;
@@ -13,7 +12,6 @@ use Intervention\Image\ImageManager;
 
 class SettingService
 {
-
     public function edit($request): array
     {
         Cache::forget('settings');
@@ -70,7 +68,7 @@ class SettingService
 
     protected function createDirIfNotExist($path)
     {
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             File::makeDirectory($path, 0777, true, true);
         }
     }
@@ -143,18 +141,21 @@ class SettingService
             'live_chat' => $app_info['live_chat'],
             'vat_ratio' => $app_info['vat_ratio'],
         ];
+
         return $data;
     }
 
     public function getFixedPage($slug): array
     {
         $content = Page::whereSlug($slug)->first()?->content;
+
         return ['key' => 'success', 'content' => $content, 'msg' => __('apis.success')];
     }
 
     public function getAppMenu($model): array
     {
         $rows = $model::latest()->get();
+
         return ['key' => 'success', 'rows' => $rows, 'msg' => __('apis.success')];
     }
 
@@ -171,6 +172,7 @@ class SettingService
             $user->update(['lang' => $request->lang]);
         }
         App::setLocale($request->lang);
+
         return ['key' => 'success', 'msg' => __('apis.updated')];
     }
 }
