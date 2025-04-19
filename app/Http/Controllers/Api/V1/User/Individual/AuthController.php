@@ -19,29 +19,30 @@ use Modules\Users\App\Models\User;
 
 class AuthController extends Controller
 {
-
     use ResponseTrait;
 
-    private $authService, $userService;
+    private $authService;
+
+    private $userService;
 
     public function __construct()
     {
         $this->authService = new AuthService(User::class);
-        $this->userService = new ClientService();
+        $this->userService = new ClientService;
     }
 
-//    public function login(LoginRequest $request): JsonResponse
-//    {
-//        try {
-//            $data = $this->userService->findOrNew(data: $request->only(['phone', 'country_code', 'type']))['data'];
-//            $data = $this->authService->loginViaPhone($data);
-//            return $this->jsonResponse(msg: $data['msg'], data: $data['data'] ?? [], key: $data['key']);
-//        } catch (\Exception $e) {
-//            return $this->jsonResponse(msg: $e->getMessage(), code: 500, error: true, errors: [
-//                'file' => $e->getFile(), 'line' => $e->getLine()
-//            ]);
-//        }
-//    }
+    //    public function login(LoginRequest $request): JsonResponse
+    //    {
+    //        try {
+    //            $data = $this->userService->findOrNew(data: $request->only(['phone', 'country_code', 'type']))['data'];
+    //            $data = $this->authService->loginViaPhone($data);
+    //            return $this->jsonResponse(msg: $data['msg'], data: $data['data'] ?? [], key: $data['key']);
+    //        } catch (\Exception $e) {
+    //            return $this->jsonResponse(msg: $e->getMessage(), code: 500, error: true, errors: [
+    //                'file' => $e->getFile(), 'line' => $e->getLine()
+    //            ]);
+    //        }
+    //    }
     /**
      * Handle user login request
      */
@@ -61,6 +62,7 @@ class AuthController extends Controller
     protected function handleInactiveUser(User $user)
     {
         $user->sendVerificationCode();
+
         return $this->phoneActivationReturn($user);
     }
 
@@ -68,6 +70,7 @@ class AuthController extends Controller
     {
         $user->sendVerificationCode();
         $token = $user->login();
+
         return $this->response(
             'success',
             msg: __('apis.signed'),
@@ -82,12 +85,14 @@ class AuthController extends Controller
             $data = $this->authService->activate($request->validated());
             $go_to_register_step = $this->userService->isRegistered($data['data']['user']);
             DB::commit();
+
             return $this->jsonResponse(msg: $data['msg'], data: [
                 'user' => UserResource::make($data['data']['user'])->setToken($data['data']['token']),
-                'go_to_register_step' => $go_to_register_step
+                'go_to_register_step' => $go_to_register_step,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return $this->jsonResponse(msg: $e->getMessage(), code: $e->getCode(), error: true,
                 errors: ['file' => $e->getFile(), 'line' => $e->getLine()]);
         }
@@ -96,8 +101,9 @@ class AuthController extends Controller
     public function completeData(RegisterRequest $request): JsonResponse
     {
         $data = $this->authService->register(request: $request->validated());
+
         return $this->jsonResponse(msg: $data['msg'], data: [
-            'user' => UserResource::make($data['user'])->setToken($request->headers->get('Authorization'))
+            'user' => UserResource::make($data['user'])->setToken($request->headers->get('Authorization')),
         ]);
     }
 
@@ -134,15 +140,16 @@ class AuthController extends Controller
     protected function blockedUserResponse($user): JsonResponse
     {
         return $this->respondWithError(__('auth.blocked'), 403, [
-            'user' => UserResource::make($user)
+            'user' => UserResource::make($user),
         ]);
     }
 
     protected function inactiveUserResponse($user): JsonResponse
     {
         $user->sendVerificationCode();
+
         return $this->respondWithError(__('auth.not_active'), 403, [
-            'user' => UserResource::make($user)
+            'user' => UserResource::make($user),
         ]);
     }
 
@@ -152,9 +159,7 @@ class AuthController extends Controller
         $token = $user->createAuthToken();
 
         return $this->respondWithSuccess(__('auth.signed'), [
-            'user' => UserResource::make($user)->additional(['token' => $token])
+            'user' => UserResource::make($user)->additional(['token' => $token]),
         ]);
     }
-
-
 }

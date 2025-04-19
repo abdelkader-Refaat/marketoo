@@ -28,7 +28,7 @@ class UsersDatabaseSeeder extends Seeder
             'country_id' => $country?->id,
             'city_id' => $country?->cities()->inRandomOrder()->first()?->id,
             'is_blocked' => 0,
-            'active' => 1,
+            'is_active' => 1,
             'created_at' => now(),
         ]);
         for ($i = 0; $i < 20; $i++) {
@@ -40,11 +40,10 @@ class UsersDatabaseSeeder extends Seeder
                 'phone' => $saudiArabiaNums,
                 'email' => $faker->unique()->safeEmail,
                 'password' => bcrypt('password'),
-                // Hashed password although i am casting in model but insert didn"t depend on fillable casts
                 'country_id' => $country->id,
                 'city_id' => $country->cities()->inRandomOrder()->first()->id ?? null,
                 'is_blocked' => rand(0, 1),
-                'active' => rand(0, 1),
+                'is_active' => rand(0, 1),
                 'created_at' => now(),
             ];
         }

@@ -13,11 +13,9 @@ class PaymentController extends Controller
 {
     use ResponseTrait;
 
-    public function __construct(protected PaymentGatewayContract $paymentGateway)
-    {
-    }
+    public function __construct(protected PaymentGatewayContract $paymentGateway) {}
 
-// app/Http/Controllers/Apis/V1/Payment/PaymentController.php
+    // app/Http/Controllers/Apis/V1/Payment/PaymentController.php
 
     public function paymentProcess(PaymentRequest $request)
     {
@@ -32,10 +30,10 @@ class PaymentController extends Controller
         if ($gatewayResponse['status'] === 'requires_redirect') {
             if ($gatewayResponse['gateway'] === 'hyperpay') {
                 $responseData['checkout_id'] = $gatewayResponse['invoice_id'];
-                $responseData['widget_url'] = config("payments.Hyperpay.CHECKOUT_URL").'?checkoutId='.$gatewayResponse['invoice_id'];
+                $responseData['widget_url'] = config('payments.Hyperpay.CHECKOUT_URL').'?checkoutId='.$gatewayResponse['invoice_id'];
                 $responseData['payment_form_url'] = route('site.payments.hyperpay.form', [
                     'transaction_id' => $gatewayResponse['invoice_id'],
-                    'brand_type' => 'VISA MASTER AMEX'
+                    'brand_type' => 'VISA MASTER AMEX',
                 ]);
 
                 // For Inertia.js requests
@@ -43,7 +41,7 @@ class PaymentController extends Controller
                     return redirect()->route('payment.hyperpay.inertia-form')->with([
                         'transaction_id' => $gatewayResponse['invoice_id'],
                         'brand_type' => 'VISA MASTER AMEX',
-                        'widget_url' => $responseData['widget_url']
+                        'widget_url' => $responseData['widget_url'],
                     ]);
                 }
             } else {
@@ -62,13 +60,13 @@ class PaymentController extends Controller
 
             return response()->json([
                 'success' => $success,
-                'message' => $success ? 'Payment succeeded' : 'Payment failed'
+                'message' => $success ? 'Payment succeeded' : 'Payment failed',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Callback processing failed',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -94,7 +92,7 @@ class PaymentController extends Controller
     {
         return view('payment.hyperpay.payment', [
             'transaction_id' => $transaction_id,
-            'brand_type' => $brand_type
+            'brand_type' => $brand_type,
         ]);
     }
 }

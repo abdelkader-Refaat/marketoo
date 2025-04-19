@@ -6,20 +6,22 @@ use App\Traits\ResponseTrait;
 use Closure;
 use Illuminate\Http\Request;
 
-class CheckAuthStatus {
-  use ResponseTrait;
+class CheckAuthStatus
+{
+    use ResponseTrait;
 
-  public function handle(Request $request, Closure $next) {
-    if (!auth()->check()) {
-      return $this->unauthenticatedReturn();
+    public function handle(Request $request, Closure $next)
+    {
+        if (! auth()->check()) {
+            return $this->unauthenticatedReturn();
+        }
+
+        $user = auth()->user();
+
+        if (! $user->active) {
+            return $this->phoneActivationReturn($user);
+        }
+
+        return $next($request);
     }
-
-    $user = auth()->user();
-
-    if (!$user->active) {
-      return $this->phoneActivationReturn($user);
-    }
-
-    return $next($request);
-  }
 }

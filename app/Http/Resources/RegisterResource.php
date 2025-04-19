@@ -8,7 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class RegisterResource extends JsonResource
 {
-
     public function __construct($resource, protected string $token)
     {
         parent::__construct($resource);
@@ -25,15 +24,15 @@ class RegisterResource extends JsonResource
             'phone' => $this->phone ?? null,
             'full_phone' => $this->full_phone,
             'email' => $this->email,
-//            'category' => $this->category?->name ?? "",
+            //            'category' => $this->category?->name ?? "",
             'country' => $this->country?->name,
             'city' => $this->city?->name,
-            'is_active' => (boolean) $this->is_active,
-            'is_blocked' => (boolean) $this->is_blocked,
-            'is_approved' => (boolean) $this->is_approved,
+            'is_active' => (bool) $this->active,
+            'is_blocked' => (bool) $this->is_blocked,
+//            'is_approved' => (bool) $this->is_approved,
             'type' => strtolower(UserTypesEnum::tryFrom($this->type)?->name),
             'token' => $this->token,
-//            'type' => $this->
+            //            'type' => $this->
         ];
     }
 }
