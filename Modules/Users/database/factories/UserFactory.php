@@ -1,10 +1,10 @@
 <?php
 
 namespace Modules\Users\database\factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Modules\Users\App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Factory;
-
 
 class UserFactory extends Factory
 {
@@ -28,6 +28,6 @@ class UserFactory extends Factory
             'is_blocked' => rand(0, 1),
             'active' => rand(0, 1),
             'created_at' => now(),
-        ];    }
+        ];
+    }
 }
-

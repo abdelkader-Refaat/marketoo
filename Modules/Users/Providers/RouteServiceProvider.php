@@ -2,9 +2,9 @@
 
 namespace Modules\Users\Providers;
 
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -24,6 +24,7 @@ class RouteServiceProvider extends ServiceProvider
                     session(['locale' => $lang]);
                     app()->setLocale($lang);
                 }
+
                 return back();
             })->name('filament.lang.switch');
         });

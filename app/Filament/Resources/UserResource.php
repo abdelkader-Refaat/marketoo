@@ -14,6 +14,7 @@ use Modules\Users\App\Models\User;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function form(Form $form): Form
@@ -45,7 +46,7 @@ class UserResource extends Resource
                     ->dehydrateStateUsing(fn($state) => Hash::make($state))
                     ->maxLength(255),
 
-                Forms\Components\Toggle::make('active')
+                Forms\Components\Toggle::make('is_active')
                     ->label(__('users.field.active')),
             ]);
     }
@@ -60,15 +61,15 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('full_phone')->sortable()->searchable(),
-                Tables\Columns\BooleanColumn::make('active')
+                Tables\Columns\BooleanColumn::make('is_active')
                     ->label(__('users.field.active')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->dateTime(),
             ])
             ->filters([
-                Tables\Filters\Filter::make('active')
-                    ->query(fn($query) => $query->where('active', true))
+                Tables\Filters\Filter::make('is_active')
+                    ->query(fn($query) => $query->where('is_active', true))
                     ->label(__('users.filters.active')),
             ])
             ->actions([

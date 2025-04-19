@@ -2,7 +2,9 @@
 
 namespace Modules\Users\App\Models;
 
+use App\Models\City;
 use App\Models\Core\AuthBaseModel;
+use App\Models\Country;
 use App\Models\PaymentTransaction;
 use App\Traits\Admin\Users\RelationsTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +16,9 @@ class User extends AuthBaseModel
     use RelationsTrait;
 
     const IMAGEPATH = 'users';
+
     const FILES = ['avatar'];
+
     const FILEPATH = 'users';
 
     protected $fillable = [
@@ -26,7 +30,7 @@ class User extends AuthBaseModel
         'password',
         'city_id',
         'country_id',
-        'active',
+        'is_active',
         'is_blocked',
         'is_approved',
         'lang',
@@ -57,12 +61,11 @@ class User extends AuthBaseModel
     {
         return [
             'is_blocked' => 'boolean',
-            'active' => 'boolean',
+            'is_active' => 'boolean',
             'is_notify' => 'boolean',
             'type' => 'integer',
-            'password' => 'hashed'
+            'password' => 'hashed',
 
         ];
     }
-
 }

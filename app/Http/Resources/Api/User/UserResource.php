@@ -28,8 +28,8 @@ class UserResource extends JsonResource
             'full_phone' => $this->full_phone,
             'lang' => $this->lang,
             'is_notify' => $this->is_notify,
-            'country' => BasicResource::make($this->whenLoaded('country')),
-            'city' => BasicResource::make($this->whenLoaded('city')),
+            'country' => $this->country->toResource(BasicResource::class),
+            'city' => $this->city->toResource(BasicResource::class),
             'token' => $this->when($this->token, $this->token),
         ];
     }

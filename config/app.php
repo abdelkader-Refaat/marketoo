@@ -29,7 +29,6 @@ return [
     'env' => env('APP_ENV', 'production'),
     'google_api_key' => env('GOOGLE_API_KEY', 'AIzaSyAE7JUUWTDRHTWhMGcqniqlqj5UjPYZrG8'),
 
-
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
@@ -67,7 +66,7 @@ return [
     |
     */
 
-//    'timezone' => 'UTC',
+    //    'timezone' => 'UTC',
     'timezone' => 'Asia/Riyadh',
 
     /*
@@ -88,7 +87,6 @@ return [
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     'available_locales' => ['en', 'ar', 'fr'],
-
 
     /*
     |--------------------------------------------------------------------------

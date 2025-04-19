@@ -7,5 +7,6 @@
     "Quotes": true,
     "Blog": true,
     "Admins": true,
-    "Blogs": true
+    "Blogs": true,
+    "Providers": true
 }
