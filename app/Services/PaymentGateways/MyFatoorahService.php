@@ -4,7 +4,6 @@ namespace App\Services\PaymentGateways;
 
 use App\Contracts\PaymentGatewayContract;
 use App\Enums\MyFatoorahPaymentMethod;
-use App\Enums\PayStatusEnum;
 use Illuminate\Http\Request;
 
 class MyFatoorahService extends BasePaymentService implements PaymentGatewayContract
@@ -29,13 +28,13 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
             $apiResponse = $this->buildRequest('POST', '/v2/ExecutePayment', $paymentData);
 
             // Handle API communication errors
-            if (!$apiResponse['success']) {
+            if (! $apiResponse['success']) {
                 return [
                     'gateway' => 'myfatoorah',
                     'status' => 'communication_error',
                     'message' => 'Could not connect to payment gateway',
                     'gateway_response' => $apiResponse['error'],
-                    'http_status' => $apiResponse['http_status']
+                    'http_status' => $apiResponse['http_status'],
                 ];
             }
 
@@ -50,7 +49,7 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
                     'payment_url' => $responseData['Data']['PaymentURL'],
                     'invoice_id' => $responseData['Data']['InvoiceId'],
                     'gateway_response' => $responseData,
-                    'http_status' => 200
+                    'http_status' => 200,
                 ];
             }
 
@@ -61,7 +60,7 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
                 'message' => $responseData['Message'] ?? 'Payment initiation failed',
                 'validation_errors' => $responseData['ValidationErrors'] ?? null,
                 'gateway_response' => $responseData,
-                'http_status' => 422
+                'http_status' => 422,
             ];
         } catch (\ValueError $e) {
             return [
@@ -69,7 +68,7 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
                 'status' => 'invalid_request',
                 'message' => 'Invalid payment method',
                 'valid_methods' => array_column(MyFatoorahPaymentMethod::cases(), 'value'),
-                'http_status' => 400
+                'http_status' => 400,
             ];
         } catch (\Exception $e) {
             return [
@@ -77,7 +76,7 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
                 'status' => 'processing_error',
                 'message' => 'Payment processing error',
                 'debug' => config('app.debug') ? $e->getMessage() : null,
-                'http_status' => 500
+                'http_status' => 500,
             ];
         }
     }
@@ -87,7 +86,7 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
         $paymentId = $request->paymentId;
         $response = $this->buildRequest('POST', '/v2/getPaymentStatus', [
             'KeyType' => 'PaymentId',
-            'Key' => $paymentId
+            'Key' => $paymentId,
         ]);
 
         $responseData = $response->getData(true);
@@ -97,13 +96,14 @@ class MyFatoorahService extends BasePaymentService implements PaymentGatewayCont
 
     protected function getGatewayName(): string
     {
-        return ucfirst(config("payments.active_gateway"));
+        return ucfirst(config('payments.active_gateway'));
     }
 
     protected function getDefaultHeaders(): array
     {
         $config = config("payments.{$this->gatewayName}");
         $apiToken = $this->testMode ? $config['TEST_API_TOKEN'] : $config['LIVE_API_TOKEN'];
+
         return [
             'Authorization' => 'Bearer '.$apiToken,
             'Content-Type' => 'application/json',

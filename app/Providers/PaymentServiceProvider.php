@@ -15,7 +15,8 @@ class PaymentServiceProvider extends ServiceProvider
             if (!class_exists($serviceClass)) {
                 throw new \RuntimeException("Payment gateway service {$gateway} not found");
             }
-            return new $serviceClass();
+
+            return new $serviceClass;
         });
     }
 }
