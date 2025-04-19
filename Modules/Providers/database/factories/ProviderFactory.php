@@ -1,17 +1,17 @@
 <?php
 
-namespace Modules\Users\database\factories;
+namespace Modules\Providers\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Modules\Users\App\Models\User;
+use Modules\Providers\Models\Provider;
 
-class UserFactory extends Factory
+class ProviderFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = User::class;
+    protected $model = Provider::class;
 
     /**
      * Define the model's default state.
@@ -31,3 +31,4 @@ class UserFactory extends Factory
         ];
     }
 }
+

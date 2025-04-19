@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Users\database\seeders;
+namespace Modules\Providers\Database\Seeders;
 
 use App\Models\Country;
 use Faker\Factory;
 use Illuminate\Database\Seeder;
-use Modules\Users\App\Models\User;
+use Modules\Providers\App\Models\Provider;
 
-class UsersDatabaseSeeder extends Seeder
+class ProvidersDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,10 +16,10 @@ class UsersDatabaseSeeder extends Seeder
     {
         $faker = Factory::create('ar_SA');
         $saudiArabiaNums = $faker->unique()->numberBetween(500000000, 599999999);
+        $providers = [];
 
-        $users = [];
         $country = Country::has('cities')->inRandomOrder()->first();
-        User::create([
+        Provider::create([
             'name' => 'Abdekader Refaat',
             'phone' => '551111111',
             'avatar' => 'ar.png',
@@ -32,10 +32,10 @@ class UsersDatabaseSeeder extends Seeder
             'created_at' => now(),
         ]);
         for ($i = 0; $i < 20; $i++) {
-            if (!$country) {
+            if (! $country) {
                 continue;
             }
-            $users[] = [
+            $providers[] = [
                 'name' => $faker->name,
                 'phone' => $saudiArabiaNums,
                 'email' => $faker->unique()->safeEmail,
@@ -47,6 +47,6 @@ class UsersDatabaseSeeder extends Seeder
                 'created_at' => now(),
             ];
         }
-        User::insert($users);
+        Provider::insert($providers);
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\UserTypesEnum;
 use App\Models\City;
 use App\Models\Country;
 use Illuminate\Database\Migrations\Migration;
@@ -13,7 +12,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('providers', function (Blueprint $table) {
             $table->id();
             $table->string('name', 50)->nullable();
             $table->string('avatar', 50)->nullable();
@@ -28,7 +27,6 @@ return new class extends Migration {
             $table->boolean('is_active')->default(false);
             $table->boolean('is_blocked')->default(false);
             $table->boolean('is_notify')->default(true);
-            $table->unsignedTinyInteger('type')->default(UserTypesEnum::INDIVIDUAL->value);
             $table->string('code', 10)->nullable();
             $table->timestamp('code_expire')->nullable();
             $table->softDeletes();
@@ -41,6 +39,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('providers');
     }
 };
