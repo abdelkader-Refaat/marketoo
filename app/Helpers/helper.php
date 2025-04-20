@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Seo;
 use App\Models\PublicSettings\SiteSetting;
+use App\Models\Seo;
 use Illuminate\Support\Facades\Http;
 
 function seo($key)
@@ -12,21 +12,22 @@ function seo($key)
 function appInformations()
 {
     $result = SiteSetting::pluck('value', 'key');
+
     return $result;
 }
-
 
 function convert2english($string)
 {
     $newNumbers = range(0, 9);
-    $arabic = array('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩');
+    $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
     $string = str_replace($arabic, $newNumbers, $string);
+
     return $string;
 }
 
 function fixPhone($string = null)
 {
-    if (!$string) {
+    if (! $string) {
         return null;
     }
 
@@ -34,6 +35,7 @@ function fixPhone($string = null)
     $result = ltrim($result, '00');
     $result = ltrim($result, '0');
     $result = ltrim($result, '+');
+
     return $result;
 }
 
@@ -44,35 +46,35 @@ function getYoutubeVideoId($youtubeUrl)
         $youtubeUrl,
         $videoId
     );
-    return $youtubeVideoId = isset($videoId[1]) ? $videoId[1] : "";
+
+    return $youtubeVideoId = isset($videoId[1]) ? $videoId[1] : '';
 }
 
-function lang()
+function lang(): string
 {
     return App()->getLocale();
 }
 
-function generateRandomCode()
+function generateRandomCode(): int
 {
-    return '1234';
-    return rand(1111, 4444);
+    return random_int(1111, 4444);
 }
 
-if (!function_exists('languages')) {
+if (! function_exists('languages')) {
     function languages()
     {
         return ['ar', 'en'];
     }
 }
 
-if (!function_exists('defaultLang')) {
+if (! function_exists('defaultLang')) {
     function defaultLang()
     {
         return 'ar';
     }
 }
 
-if (!function_exists('calculateDistance')) {
+if (! function_exists('calculateDistance')) {
     function calculateDistance($latitude1, $longitude1, $latitude2, $longitude2): array
     {
         if ($latitude1 == $latitude2 && $longitude1 == $longitude2) {
@@ -86,32 +88,35 @@ if (!function_exists('calculateDistance')) {
                 'value' => $distance->object()->routes[0]->legs[0]->distance->text,
                 'text' => $distance->object()->routes[0]->legs[0]->distance->text,
                 'duration' => $distance->object()->routes[0]->legs[0]->duration->text,
-                'start_address' => explode(',', $distance->object()->routes[0]->legs[0]->start_address)[0]
+                'start_address' => explode(',', $distance->object()->routes[0]->legs[0]->start_address)[0],
             ];
         }
+
         return ['value' => '0 ', 'text' => '0 m', 'duration' => '0 min', 'start_address' => ''];
     }
 }
 
-if (!function_exists('getDeliveryPrice')) {
+if (! function_exists('getDeliveryPrice')) {
     function getDeliveryPrice($user_lat, $user_lng, $provider_lat, $provider_lng): array
     {
         $distance = floatval(preg_replace('/[^0-9.]/', '',
             calculateDistance($user_lat, $user_lng, $provider_lat, $provider_lng)['value']));
+
         return ['price' => $distance * SiteSetting::where('key', 'price_per_kilometer')->first()->value];
     }
 }
 
-if (!function_exists('newNumberFormat')) {
+if (! function_exists('newNumberFormat')) {
     function newNumberFormat($number)
     {
         $formatter = new NumberFormatter('en', NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
         $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, 2);
         $formattedNumber = $formatter->format($number);
+
         return $formattedNumber;
     }
 
-    if (!function_exists('timeAgo')) {
+    if (! function_exists('timeAgo')) {
         function timeAgo($timestamp)
         {
             $time = \Carbon\Carbon::parse($timestamp);
@@ -142,6 +147,7 @@ if (!function_exists('newNumberFormat')) {
     function formatArabicTime($value, $type)
     {
         $unit = arabicUnit($value, $type);
+
         return $value == 2
             ? __('apis.time_ago.just_unit', ['unit' => $unit])
             : __('apis.time_ago.full', ['value' => $value, 'unit' => $unit]);

@@ -1,5 +1,7 @@
 <?php
 
+use app\Http\Controllers\Api\V1\General\SettingController;
+use App\Http\Controllers\Site\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -8,10 +10,8 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-
+    Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('intro-sliders', [SettingController::class, 'introSlider'])->name('intro-sliders');
     Route::prefix('payments')->name('payments.')->group(function () {
         Route::get('/', function () {
             return Inertia::render('Payment/Initiate');

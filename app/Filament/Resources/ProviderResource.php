@@ -3,10 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProviderResource\Pages;
-use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -21,53 +26,55 @@ class ProviderResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('name')
+            TextInput::make('name')
                 ->label(__('providers.field.name'))
                 ->maxLength(50)
                 ->nullable(),
 
-            Forms\Components\FileUpload::make('avatar')
+            FileUpload::make('avatar')
                 ->label(__('providers.field.avatar'))
                 ->image()
                 ->directory('provider-avatars')
                 ->nullable(),
 
-            Forms\Components\FileUpload::make('cover')
+            FileUpload::make('cover')
                 ->label(__('providers.field.cover'))
                 ->image()
                 ->directory('provider-covers')
                 ->nullable(),
 
-            Forms\Components\TextInput::make('email')
+            TextInput::make('email')
                 ->label(__('providers.field.email'))
                 ->email()
                 ->maxLength(50)
                 ->unique(Provider::class, 'email', ignoreRecord: true)
                 ->nullable(),
 
-            Forms\Components\TextInput::make('country_code')
+            TextInput::make('country_code')
                 ->label(__('providers.field.country_code'))
                 ->maxLength(5)
                 ->default('966'),
 
-            Forms\Components\TextInput::make('phone')
+            TextInput::make('phone')
                 ->label(__('providers.field.phone'))
                 ->maxLength(15)
                 ->required(),
 
-            Forms\Components\TextInput::make('password')
+            TextInput::make('password')
                 ->label(__('providers.field.password'))
                 ->password()
+                ->revealable()
                 ->required(fn($record) => !$record)
                 ->maxLength(100),
 
-            Forms\Components\Toggle::make('is_active')
+
+            Toggle::make('is_active')
                 ->label(__('providers.field.is_active')),
 
-            Forms\Components\Toggle::make('is_blocked')
+            Toggle::make('is_blocked')
                 ->label(__('providers.field.is_blocked')),
 
-            Forms\Components\Toggle::make('is_notify')
+            Toggle::make('is_notify')
                 ->label(__('providers.field.is_notify')),
         ]);
     }
@@ -75,21 +82,21 @@ class ProviderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
-            Tables\Columns\ImageColumn::make('avatar')
+            ImageColumn::make('avatar')
                 ->label(__('providers.field.avatar'))
                 ->circular(),
 
-            Tables\Columns\TextColumn::make('name')
+            TextColumn::make('name')
                 ->label(__('providers.field.name'))
                 ->sortable()
                 ->searchable(),
 
-            Tables\Columns\TextColumn::make('email')
+            TextColumn::make('email')
                 ->label(__('providers.field.email'))
                 ->sortable()
                 ->searchable(),
 
-            Tables\Columns\TextColumn::make('phone')
+            TextColumn::make('phone')
                 ->label(__('providers.field.phone'))
                 ->sortable()
                 ->searchable(),
