@@ -8,7 +8,8 @@ use Spatie\Translatable\HasTranslations;
 class IntroSlider extends BaseModel
 {
     use HasTranslations;
-    const IMAGEPATH = 'intro_sliders' ;
-    protected $fillable = ['image','title','description'];
-    public $translatable = ['title' , 'description'];
+
+    const string IMAGEPATH = 'intro_sliders';
+    public array $translatable = ['title', 'description'];
+    protected $fillable = ['image', 'title', 'description'];
 }

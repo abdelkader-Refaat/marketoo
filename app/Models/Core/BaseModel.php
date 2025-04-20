@@ -2,8 +2,8 @@
 
 namespace App\Models\Core;
 
-use Carbon\Carbon;
 use App\Traits\UploadTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class BaseModel extends Model
@@ -48,6 +48,7 @@ class BaseModel extends Model
                 }
             }
         });
+
         return $query->orderBy('created_at',
             request()->searchArray && request()->searchArray['order'] ? request()->searchArray['order'] : 'DESC');
     }
@@ -59,16 +60,15 @@ class BaseModel extends Model
         } else {
             $image = $this->defaultImage(static::IMAGEPATH);
         }
+
         return $image;
     }
 
     public function setImageAttribute($value)
     {
-        if (null != $value && is_file($value)) {
+        if ($value != null && is_file($value)) {
             isset($this->attributes['image']) ? $this->deleteFile($this->attributes['image'], static::IMAGEPATH) : '';
             $this->attributes['image'] = $this->uploadAllTypes($value, static::IMAGEPATH);
         }
     }
-
-
 }
