@@ -1,23 +1,28 @@
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import Slider from '@/components/dashboard/slider';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard'
-    }
-];
+interface DashboardProps {
+    introSliders: {
+        id: number;
+        image: string;
+        title: string;
+        description: string;
+    }[];
+    breadcrumbs: {
+        title: string;
+        href: string;
+    }[];
+}
 
-export default function Dashboard() {
+export default function Dashboard({ introSliders, breadcrumbs }: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-6">
                 {/* Slider section */}
                 <div className="w-full">
-                    <Slider />
+                    <Slider sliders={introSliders} />
                 </div>
 
                 {/* Rest of your content */}
@@ -27,7 +32,7 @@ export default function Dashboard() {
 
                 <div
                     className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[60vh] flex-1 overflow-hidden rounded-xl border">
-                    <h1>welocme</h1>
+                    <h1>Welcome</h1>
                     {/* Main content */}
                 </div>
             </div>

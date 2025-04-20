@@ -17,9 +17,12 @@ class TestingController extends Controller
 
     public function __invoke(Request $request)
     {
-        return uri(IntroSlider::first()->image);
-//        return UserCollection::make(User::query()->withExists('posts')->whereRelation('posts', 'privacy',
+//        return UserCollection::make(User::query()->withWhereRelation('posts', 'privacy',
 //            PostPrivacyEnum::Public)->paginate($this->paginateNum()));
+
+        //        return uri(IntroSlider::first()->image);
+        //        return UserCollection::make(User::query()->withExists('posts')->whereRelation('posts', 'privacy',
+        //            PostPrivacyEnum::Public)->paginate($this->paginateNum()));
 
         //        return User::whereRelation('posts', 'privacy', PostPrivacyEnum::Public)->get();
 
