@@ -1,24 +1,30 @@
 import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 
+interface EventsProps {
+    auth: any;
+    posts: any[];
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Posts', href: '/site/posts' },
-    { title: 'Events', href: '/site/posts/events' }
+    { title: 'Posts', href: route('site.posts.index') },
+    { title: 'Events', href: route('site.posts.events') }
 ];
 
-export default function Events({ auth, posts = [] }: { auth: any; posts: any[] }) {
+export default function Events({ auth, posts = [] }: EventsProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Event Posts" />
             <div className="flex-1 p-6 lg:p-8">
                 <div className="max-w-4xl mx-auto space-y-6">
-                    <HeadingSmall title="Event Posts" description="View posts associated with events." />
-
-                    <div className="flex justify-end">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold">Event Posts</h2>
+                            <p className="text-muted-foreground">View posts associated with events</p>
+                        </div>
                         <Button asChild variant="outline">
                             <Link href={route('site.posts.index')}>Back to Posts</Link>
                         </Button>

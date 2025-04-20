@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { JSX, useEffect } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

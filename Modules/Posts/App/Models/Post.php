@@ -5,6 +5,8 @@ namespace Modules\Posts\App\Models;
 // use Laravel\Scout\Searchable;
 // use Abbasudo\Purity\Traits\Sortable;
 // use Abbasudo\Purity\Traits\Filterable;
+
+use App\Enums\PostType;
 use App\Models\Core\BaseModel;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,12 +24,13 @@ class Post extends BaseModel
 
     protected $casts = [
         'privacy' => PostPrivacyEnum::class,
+        'type' => PostType::class,
         'title' => 'array',
         'content' => 'array',
     ];
 
     protected $fillable = [
-        'user_id', 'title', 'content', 'privacy', 'slug', 'is_promoted', 'event_name', 'event_date_time',
+        'user_id', 'title', 'content', 'privacy', 'type','slug', 'is_promoted', 'event_name', 'event_date_time',
         'event_description', 'repost_id', 'repost_text',
     ];
 

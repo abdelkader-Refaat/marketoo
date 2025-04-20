@@ -9,8 +9,14 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next)
     {
-        if (session()->has('locale')) {
-            app()->setLocale(session('locale'));
+        $locale = $request->segment(1) ?? session('locale', lang());
+
+        if (in_array($locale, languages())) {
+            app()->setLocale($locale);
+            session()->put('locale', $locale);
+            // Set HTML direction
+            $direction = $locale === 'ar' ? 'rtl' : 'ltr';
+            view()->share('htmlDirection', $direction);
         }
 
         return $next($request);

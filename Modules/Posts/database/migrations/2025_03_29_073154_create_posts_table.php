@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PostType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,9 +17,9 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->json('title')->nullable();
             $table->json('content')->nullable();
+            $table->enum('type', array_column(PostType::cases(), 'value'))->default(PostType::TEXT->value);
             $table->string('slug')->unique();
-            $table->enum('privacy', array_column(PostPrivacyEnum::cases(), 'value'))
-                ->default(PostPrivacyEnum::Public ->value);
+            $table->enum('privacy', array_column(PostPrivacyEnum::cases(), 'value'))->default(PostPrivacyEnum::Public->value);
             $table->boolean('is_promoted')->default(false);
 
             // type => event

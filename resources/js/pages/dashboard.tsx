@@ -20,7 +20,7 @@ export default function Dashboard({ introSliders, breadcrumbs }: DashboardProps)
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-6">
-                {/* Slider section */}
+                {/* Slider section - pass the introSliders prop */}
                 <div className="w-full">
                     <Slider sliders={introSliders} />
                 </div>
