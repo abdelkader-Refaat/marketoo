@@ -18,7 +18,6 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::paginate();
-        app()->setLocale('ar');
         return $this->successData(PostCollection::make($posts));
         // return $this->successData(PostResource::collection($posts));
         // return response()->json( Post::filter()->get());
