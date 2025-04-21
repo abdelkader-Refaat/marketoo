@@ -15,7 +15,7 @@ class ApiLang
         if ($requestLang != null && in_array($requestLang, languages())) {
             $lang = $requestLang;
         } elseif (auth()->check()) {
-            $lang = auth()->user()->lang;
+            $lang = optional(auth()->user())->lang;
         }
 
         App::setLocale($lang);

@@ -1,150 +1,194 @@
-import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import PostsLayout from '@/posts/layout';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { router } from '@inertiajs/react';
+import HeadingSmall from '@/components/heading-small';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
+
+interface EditPostProps {
+    post: {
+        id: number;
+        title: string | Record<string, string>;
+        content: string | Record<string, string>;
+        privacy: string;
+        is_promoted: boolean;
+        slug: string;
+        event_name?: string;
+        event_date_time?: string;
+        event_description?: string;
+    };
+    errors?: Record<string, string>;
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Posts', href: '/site/posts' },
     { title: 'Edit', href: '' }
 ];
 
-const getTitle = (title: any) => {
-    if (!title) return '';
-    if (typeof title === 'string') {
+const parseValue = (value: string | Record<string, string>): string => {
+    if (!value) return '';
+    if (typeof value === 'string') {
         try {
-            const parsed = JSON.parse(title);
+            const parsed = JSON.parse(value);
             return parsed.en || Object.values(parsed)[0] || '';
         } catch {
-            return title;
+            return value;
         }
     }
-    return title.en || Object.values(title)[0] || '';
+    return value.en || Object.values(value)[0] || '';
 };
 
-const getContent = (content: any) => {
-    if (!content) return '';
-    if (typeof content === 'string') {
-        try {
-            const parsed = JSON.parse(content);
-            return parsed.en || Object.values(parsed)[0] || '';
-        } catch {
-            return content;
-        }
-    }
-    return content.en || Object.values(content)[0] || '';
-};
+export default function Edit({ post, errors }: EditPostProps) {
+    console.info(sessionStorage.getItem('lang'));
+    const { props } = usePage();
+    const currentLocale = props.currentLocale || 'ar';
+    const { data, setData, processing, put } = useForm({
+        title: parseValue(post.title),
+        content: parseValue(post.content),
+        slug: post.slug,
+        privacy: post.privacy,
+        is_promoted: post.is_promoted,
+        event_name: post.event_name || '',
+        event_date_time: post.event_date_time ?
+            new Date(post.event_date_time).toISOString().slice(0, 16) : '',
+        event_description: post.event_description || ''
+    });
 
-export default function Edit({ post }: { post: any }) {
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        router.put(route('site.posts.update', post.id), formData, {
-            forceFormData: true
+        put(route('site.posts.update', post.id), {
+            onSuccess: () => toast.success('Post updated successfully'),
+            onError: () => toast.error('Failed to update post')
         });
-
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Post" />
-            <PostsLayout>
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-semibold">Edit Post</h2>
+            <div className="flex-1 p-6 lg:p-8">
+                <div className="max-w-4xl mx-auto space-y-6">
+                    <HeadingSmall title="Edit Post" description="Update the details of your post." />
+
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <Label htmlFor="title">Title (English)</Label>
+                            <Label htmlFor="title">Title</Label>
                             <Input
                                 id="title"
-                                name="title"
-                                defaultValue={getTitle(post.title)}
+                                value={data.title}
+                                onChange={(e) => setData('title', e.target.value)}
                                 placeholder="Enter post title"
-                                required
                             />
+                            {errors?.title && <p className="text-sm text-destructive">{errors.title}</p>}
                         </div>
+
                         <div>
-                            <Label htmlFor="content">Content (English)</Label>
+                            <Label htmlFor="content">Content</Label>
                             <Textarea
                                 id="content"
-                                name="content"
-                                defaultValue={getContent(post.content)}
+                                value={data.content}
+                                onChange={(e) => setData('content', e.target.value)}
                                 placeholder="Enter post content"
-                                required
+                                rows={6}
                             />
+                            {errors?.content && <p className="text-sm text-destructive">{errors.content}</p>}
                         </div>
-                        <div>
-                            <Label htmlFor="slug">Slug</Label>
-                            <Input
-                                id="slug"
-                                name="slug"
-                                defaultValue={post.slug}
-                                placeholder="post-slug"
-                                required
-                            />
-                        </div>
+
                         <div>
                             <Label htmlFor="privacy">Privacy</Label>
-                            <Select name="privacy" defaultValue={post.privacy} required>
+                            <Select
+                                value={data.privacy}
+                                onValueChange={(value) => setData('privacy', value)}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select privacy" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="1">Public</SelectItem>
-                                    <SelectItem value="2">Private</SelectItem>
-                                    <SelectItem value="3">Unlisted</SelectItem>
+                                    <SelectItem value="public">Public</SelectItem>
+                                    <SelectItem value="private">Private</SelectItem>
+                                    <SelectItem value="friends">Friends Only</SelectItem>
                                 </SelectContent>
                             </Select>
+                            {errors?.privacy && <p className="text-sm text-destructive">{errors.privacy}</p>}
                         </div>
+
                         <div>
-                            <Label htmlFor="is_promoted">Promoted</Label>
+                            <Label htmlFor="slug">Slug</Label>
+                            <Input
+                                id="slug"
+                                value={data.slug}
+                                onChange={(e) => setData('slug', e.target.value)}
+                                placeholder="Enter post slug"
+                            />
+                            {errors?.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
+                        </div>
+
+                        <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
                                 id="is_promoted"
-                                name="is_promoted"
-                                value="1"
-                                defaultChecked={post.is_promoted}
+                                checked={data.is_promoted}
+                                onChange={(e) => setData('is_promoted', e.target.checked)}
+                                className="w-4 h-4"
                             />
+                            <Label htmlFor="is_promoted">Promoted</Label>
                         </div>
-                        <div>
-                            <Label htmlFor="event_name">Event Name (Optional)</Label>
-                            <Input
-                                id="event_name"
-                                name="event_name"
-                                defaultValue={post.event_name}
-                                placeholder="Event name"
-                            />
+
+                        {/* Event Details Section */}
+                        <div className="pt-4 mt-4 border-t">
+                            <h3 className="mb-4 font-medium">Event Details (Optional)</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="event_name">Event Name</Label>
+                                    <Input
+                                        id="event_name"
+                                        value={data.event_name}
+                                        onChange={(e) => setData('event_name', e.target.value)}
+                                        placeholder="Enter event name"
+                                    />
+                                    {errors?.event_name &&
+                                        <p className="text-sm text-destructive">{errors.event_name}</p>}
+                                </div>
+                                <div>
+                                    <Label htmlFor="event_date_time">Event Date & Time</Label>
+                                    <Input
+                                        id="event_date_time"
+                                        type="datetime-local"
+                                        value={data.event_date_time}
+                                        onChange={(e) => setData('event_date_time', e.target.value)}
+                                    />
+                                    {errors?.event_date_time &&
+                                        <p className="text-sm text-destructive">{errors.event_date_time}</p>}
+                                </div>
+                                <div>
+                                    <Label htmlFor="event_description">Event Description</Label>
+                                    <Textarea
+                                        id="event_description"
+                                        value={data.event_description}
+                                        onChange={(e) => setData('event_description', e.target.value)}
+                                        placeholder="Event description"
+                                        rows={4}
+                                    />
+                                    {errors?.event_description &&
+                                        <p className="text-sm text-destructive">{errors.event_description}</p>}
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <Label htmlFor="event_date_time">Event Date & Time (Optional)</Label>
-                            <Input
-                                id="event_date_time"
-                                name="event_date_time"
-                                type="datetime-local"
-                                defaultValue={
-                                    post.event_date_time
-                                        ? new Date(post.event_date_time).toISOString().slice(0, 16)
-                                        : ''
-                                }
-                            />
+
+                        <div className="flex justify-end space-x-2">
+                            <Button asChild variant="outline">
+                                <Link href={route('site.posts.index')}>Cancel</Link>
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                Update Post
+                            </Button>
                         </div>
-                        <div>
-                            <Label htmlFor="event_description">Event Description (Optional)</Label>
-                            <Textarea
-                                id="event_description"
-                                name="event_description"
-                                defaultValue={post.event_description}
-                                placeholder="Event description"
-                            />
-                        </div>
-                        <Button type="submit">Update Post</Button>
                     </form>
                 </div>
-            </PostsLayout>
+            </div>
         </AppLayout>
     );
 }

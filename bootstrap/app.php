@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RedirectIfNotFilamentAdmin;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -84,8 +86,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'OptionalSanctumMiddleware' => \App\Http\Middleware\Api\OptionalSanctumMiddleware::class,
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
-            'inertia' => \App\Http\Middleware\HandleInertiaRequests::class,
-            'filament' => \App\Http\Middleware\RedirectIfNotFilamentAdmin::class,
+            'inertia' => HandleInertiaRequests::class,
+            'filament' => RedirectIfNotFilamentAdmin::class,
         ]);
 
         // Middleware Groups - unchanged
