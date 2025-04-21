@@ -22,14 +22,14 @@ class PostsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Register the policy
         Gate::policy(Post::class, PostPolicy::class);
 
-        // Set the locale directly without a Closure
-        $locale = session('locale', config('app.locale'));
-        app()->setLocale($locale);
+        // Skip locale handling here as it's handled by middleware
+        // This avoids conflicts with your SiteLang middleware
 
         Filament::serving(function () {
-            // If additional Filament-specific logic is needed, add it here without session interaction
+            // If additional Filament-specific logic is needed, add it here
         });
 
         $this->registerCommands();
@@ -38,7 +38,6 @@ class PostsServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
-        $this->registerTranslations();
     }
 
     protected function registerCommands(): void
@@ -73,18 +72,22 @@ class PostsServiceProvider extends ServiceProvider
         $configPath = module_path($this->name, $relativeConfigPath);
 
         if (is_dir($configPath)) {
-            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($configPath));
+            try {
+                $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($configPath));
 
-            foreach ($iterator as $file) {
-                if ($file->isFile() && $file->getExtension() === 'php') {
-                    $relativePath = str_replace($configPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
-                    $configKey = $this->nameLower.'.'.str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''],
-                            $relativePath);
-                    $key = ($relativePath === 'config.php') ? $this->nameLower : $configKey;
+                foreach ($iterator as $file) {
+                    if ($file->isFile() && $file->getExtension() === 'php') {
+                        $relativePath = str_replace($configPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                        $configKey = $this->nameLower.'.'.str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''], $relativePath);
+                        $key = ($relativePath === 'config.php') ? $this->nameLower : $configKey;
 
-                    $this->publishes([$file->getPathname() => config_path($relativePath)], 'config');
-                    $this->mergeConfigFrom($file->getPathname(), $key);
+                        $this->publishes([$file->getPathname() => config_path($relativePath)], 'config');
+                        $this->mergeConfigFrom($file->getPathname(), $key);
+                    }
                 }
+            } catch (\Exception $e) {
+                // Log error but continue execution
+                \Log::error('Error in Posts module config loading: ' . $e->getMessage());
             }
         }
     }
@@ -98,9 +101,14 @@ class PostsServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
-        $componentNamespace = $this->module_namespace($this->name,
-            $this->app_path(config('modules.paths.generator.component-class.path')));
-        Blade::componentNamespace($componentNamespace, $this->nameLower);
+        try {
+            $componentNamespace = $this->module_namespace($this->name,
+                $this->app_path(config('modules.paths.generator.component-class.path')));
+            Blade::componentNamespace($componentNamespace, $this->nameLower);
+        } catch (\Exception $e) {
+            // Log error but continue execution
+            \Log::error('Error in Posts module component namespace: ' . $e->getMessage());
+        }
     }
 
     private function getPublishableViewPaths(): array

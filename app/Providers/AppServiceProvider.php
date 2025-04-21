@@ -64,11 +64,8 @@ class AppServiceProvider extends ServiceProvider
 
         // -------------- lang ---------------- \\
         app()->singleton('lang', function () {
-            if (session()->has('lang')) {
-                return session('lang');
-            } else {
-                return 'ar';
-            }
+            return session()->has('lang') && in_array(session('lang'), languages())
+                   ? session('lang') : 'ar';
         });
         // -------------- lang ---------------- \\
     }
