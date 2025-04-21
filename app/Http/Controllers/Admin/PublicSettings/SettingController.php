@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\Admin\PublicSettings;
 
-
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\Core\SettingService;
+use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-
-    public function __construct(private SettingService $settingService)
-    {
-    }
+    public function __construct(private SettingService $settingService) {}
 
     public function switchLang($lang)
     {
@@ -27,20 +23,21 @@ class SettingController extends Controller
             }
             session()->put('lang', 'ar');
         }
+
         return redirect()->back();
     }
 
     public function index()
     {
         $data = $this->settingService->get();
+
         return view('admin.public-settings.settings.index', compact('data'));
     }
-
 
     public function update(Request $request)
     {
         $data = $this->settingService->edit($request);
+
         return back()->with($data['key'], $data['msg']);
     }
-
 }

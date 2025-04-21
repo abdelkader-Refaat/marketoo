@@ -1,4 +1,4 @@
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
@@ -43,6 +43,9 @@ const parseValue = (value: string | Record<string, string>): string => {
 };
 
 export default function Edit({ post, errors }: EditPostProps) {
+    console.info(sessionStorage.getItem('lang'));
+    const { props } = usePage();
+    const currentLocale = props.currentLocale || 'ar';
     const { data, setData, processing, put } = useForm({
         title: parseValue(post.title),
         content: parseValue(post.content),
@@ -146,7 +149,8 @@ export default function Edit({ post, errors }: EditPostProps) {
                                         onChange={(e) => setData('event_name', e.target.value)}
                                         placeholder="Enter event name"
                                     />
-                                    {errors?.event_name && <p className="text-sm text-destructive">{errors.event_name}</p>}
+                                    {errors?.event_name &&
+                                        <p className="text-sm text-destructive">{errors.event_name}</p>}
                                 </div>
                                 <div>
                                     <Label htmlFor="event_date_time">Event Date & Time</Label>
@@ -156,7 +160,8 @@ export default function Edit({ post, errors }: EditPostProps) {
                                         value={data.event_date_time}
                                         onChange={(e) => setData('event_date_time', e.target.value)}
                                     />
-                                    {errors?.event_date_time && <p className="text-sm text-destructive">{errors.event_date_time}</p>}
+                                    {errors?.event_date_time &&
+                                        <p className="text-sm text-destructive">{errors.event_date_time}</p>}
                                 </div>
                                 <div>
                                     <Label htmlFor="event_description">Event Description</Label>
@@ -167,7 +172,8 @@ export default function Edit({ post, errors }: EditPostProps) {
                                         placeholder="Event description"
                                         rows={4}
                                     />
-                                    {errors?.event_description && <p className="text-sm text-destructive">{errors.event_description}</p>}
+                                    {errors?.event_description &&
+                                        <p className="text-sm text-destructive">{errors.event_description}</p>}
                                 </div>
                             </div>
                         </div>

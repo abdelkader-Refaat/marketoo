@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (! $this->app->isProduction()) {
+        if (!$this->app->isProduction()) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrap();
         Schema::defaultStringLength(191);
         Model::automaticallyEagerLoadRelationships();  // laravel 12 latest using eager load all relations rather than use load and with for model relations to avoid n+1 problem
-        Model::shouldBeStrict(! $this->app->isProduction()); // prevent lazy loading queries
+        Model::shouldBeStrict(!$this->app->isProduction()); // prevent lazy loading queries
         DB::prohibitDestructiveCommands($this->app->isProduction());  // prevent DB:fresh commands
 
         $folders = array_diff(scandir(database_path().'/migrations'), ['..', '.']);
@@ -64,8 +64,10 @@ class AppServiceProvider extends ServiceProvider
 
         // -------------- lang ---------------- \\
         app()->singleton('lang', function () {
-            return session()->has('lang') && in_array(session('lang'), languages())
-                   ? session('lang') : 'ar';
+            return session()->get('lang', 'ar');
+        });
+        view()->composer('*', function ($view) {
+            $view->with('currentLocale', app()->getLocale());
         });
         // -------------- lang ---------------- \\
     }

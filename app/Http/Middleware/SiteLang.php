@@ -6,42 +6,35 @@ use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 
 class SiteLang
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
     public function handle(Request $request, Closure $next)
     {
-        // Default language
-        $lang = 'ar';
-
         try {
-            // Get language from app singleton if available
-            $sessionLang = app('lang');
+            // Get language from session or default to 'ar'
+            $lang = session()->get('lang', 'ar');
 
-            // Only use valid languages
-            if ($sessionLang && in_array($sessionLang, languages())) {
-                $lang = $sessionLang;
+            // Validate the language
+            if (! in_array($lang, languages())) {
+                $lang = 'ar';
             }
+
+            // Set the application locale
+            App::setLocale($lang);
+            Carbon::setLocale($lang);
+
+            // Share with all views
+            view()->share('currentLocale', $lang);
+
         } catch (\Exception $e) {
-            // If there's any error, fall back to default language
-            // Log the error if needed
-            // \Log::error('Language middleware error: ' . $e->getMessage());
+            Log::error('Language middleware error: '.$e->getMessage());
+            // Fallback to Arabic if anything goes wrong
+            App::setLocale('ar');
+            Carbon::setLocale('ar');
         }
-
-        // Set the application locale
-        App::setLocale($lang);
-
-        // Set Carbon locale for date formatting
-        Carbon::setLocale($lang);
 
         return $next($request);
     }
-
 }
