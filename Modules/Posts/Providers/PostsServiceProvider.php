@@ -4,7 +4,10 @@ namespace Modules\Posts\Providers;
 
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Posts\App\Models\Post;
+use Modules\Posts\App\Policies\PostPolicy;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -14,10 +17,13 @@ class PostsServiceProvider extends ServiceProvider
     use PathNamespace;
 
     protected string $name = 'Posts';
+
     protected string $nameLower = 'posts';
 
     public function boot(): void
     {
+        Gate::policy(Post::class, PostPolicy::class);
+
         // Set the locale directly without a Closure
         $locale = session('locale', config('app.locale'));
         app()->setLocale($locale);
