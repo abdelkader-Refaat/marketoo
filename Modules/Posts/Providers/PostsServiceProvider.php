@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Posts\App\Models\Post;
+use Modules\Posts\App\Observers\PostObserver;
 use Modules\Posts\App\Policies\PostPolicy;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -24,6 +25,7 @@ class PostsServiceProvider extends ServiceProvider
     {
         // Register the policy
         Gate::policy(Post::class, PostPolicy::class);
+        Post::observe(PostObserver::class);
 
         // Skip locale handling here as it's handled by middleware
         // This avoids conflicts with your SiteLang middleware
@@ -78,7 +80,8 @@ class PostsServiceProvider extends ServiceProvider
                 foreach ($iterator as $file) {
                     if ($file->isFile() && $file->getExtension() === 'php') {
                         $relativePath = str_replace($configPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
-                        $configKey = $this->nameLower.'.'.str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''], $relativePath);
+                        $configKey = $this->nameLower.'.'.str_replace([DIRECTORY_SEPARATOR, '.php'], ['.', ''],
+                                $relativePath);
                         $key = ($relativePath === 'config.php') ? $this->nameLower : $configKey;
 
                         $this->publishes([$file->getPathname() => config_path($relativePath)], 'config');
@@ -87,7 +90,7 @@ class PostsServiceProvider extends ServiceProvider
                 }
             } catch (\Exception $e) {
                 // Log error but continue execution
-                \Log::error('Error in Posts module config loading: ' . $e->getMessage());
+                \Log::error('Error in Posts module config loading: '.$e->getMessage());
             }
         }
     }
@@ -107,7 +110,7 @@ class PostsServiceProvider extends ServiceProvider
             Blade::componentNamespace($componentNamespace, $this->nameLower);
         } catch (\Exception $e) {
             // Log error but continue execution
-            \Log::error('Error in Posts module component namespace: ' . $e->getMessage());
+            \Log::error('Error in Posts module component namespace: '.$e->getMessage());
         }
     }
 
