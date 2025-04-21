@@ -2,6 +2,7 @@
 
 namespace Modules\Posts\Providers;
 
+use App\Http\Middleware\SiteLang;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +38,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapSiteRoutes(): void
     {
-        Route::middleware(['web', 'auth'])
+        Route::middleware(['web', 'auth', SiteLang::class])
             ->prefix('site')
             ->name('site.')
             ->group(module_path($this->name, '/Routes/front/site.php'));

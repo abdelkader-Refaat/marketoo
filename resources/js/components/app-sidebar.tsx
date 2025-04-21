@@ -15,6 +15,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, LayoutGrid, FileText, Home } from 'lucide-react';
 import AppLogo from './app-logo';
 
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -42,6 +43,7 @@ const footerNavItems: NavItem[] = [
     }
 ];
 
+
 export function AppSidebar() {
     const { url } = usePage();
 
@@ -64,11 +66,14 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter
-                    items={footerNavItems.map((item) => ({ ...item, href: item.url, external: item.external }))}
-                    className="mt-auto"
-                />
-                <NavUser />
+                <div className="flex flex-col gap-4">
+
+                    <NavFooter
+                        items={footerNavItems.map((item) => ({ ...item, href: item.url, external: item.external }))}
+                        className="mt-auto"
+                    />
+                    <NavUser />
+                </div>
             </SidebarFooter>
         </Sidebar>
     );

@@ -30,7 +30,7 @@ class Post extends BaseModel
     ];
 
     protected $fillable = [
-        'user_id', 'title', 'content', 'privacy', 'type','slug', 'is_promoted', 'event_name', 'event_date_time',
+        'user_id', 'title', 'content', 'privacy', 'type', 'slug', 'is_promoted', 'event_name', 'event_date_time',
         'event_description', 'repost_id', 'repost_text',
     ];
 

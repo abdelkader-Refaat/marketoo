@@ -12,6 +12,7 @@ class PostController extends Controller
 {
     public function index()
     {
+        // dd(auth()->id());
         $posts = auth()->user()->posts()->latest()->get();
 
         return Inertia::render('posts/index', [
@@ -21,9 +22,11 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        auth()->user()->posts()->create($request->validated());
+        $post = auth()->user()->posts()->create($request->validated());
 
-        return redirect()->route('site.posts.index')->with('success', 'Post created successfully.');
+        return redirect()
+            ->route('site.posts.index')
+            ->with('success', __('admin.added_successfully'));
     }
 
     public function create()
@@ -34,7 +37,11 @@ class PostController extends Controller
     public function show(Post $post)
     {
         return Inertia::render('posts/show', [
-            'post' => $post,
+            'post' => $post->load('user'),
+            'can' => [
+                'update' => true, // Since we're getting user's posts, they can always update
+                'delete' => true, // Since we're getting user's posts, they can always delete
+            ],
         ]);
     }
 
@@ -42,6 +49,7 @@ class PostController extends Controller
     {
         return Inertia::render('posts/edit', [
             'post' => $post,
+            'errors' => session()->get('errors')?->getBag('default')?->getMessages(),
         ]);
     }
 
@@ -49,21 +57,27 @@ class PostController extends Controller
     {
         $post->update($request->validated());
 
-        return redirect()->route('site.posts.index')->with('success', 'Post updated successfully.');
+        return redirect()
+            ->route('site.posts.index')
+            ->with('success', __('admin.update_successfullay'));
     }
 
     public function destroy(Post $post)
     {
         $post->delete();
 
-        return redirect()->route('site.posts.index')->with('success', 'Post deleted successfully.');
+        return redirect()
+            ->route('site.posts.index')
+            ->with('success', __('admin.deleted_successfully'));
     }
 
     public function events()
     {
         return Inertia::render('posts/events', [
             'posts' => auth()->user()->posts()
-                ->whereNotNull('event_name')->latest()->get(),
+                ->whereNotNull('event_name')
+                ->latest()
+                ->get(),
         ]);
     }
 
@@ -71,7 +85,9 @@ class PostController extends Controller
     {
         return Inertia::render('posts/promoted', [
             'posts' => auth()->user()->posts()
-                ->where('is_promoted', true)->latest()->get(),
+                ->where('is_promoted', true)
+                ->latest()
+                ->get(),
         ]);
     }
 
@@ -79,7 +95,9 @@ class PostController extends Controller
     {
         return Inertia::render('posts/archived', [
             'posts' => auth()->user()->posts()
-                ->where('is_archived', true)->latest()->get(),
+                ->where('is_archived', true)
+                ->latest()
+                ->get(),
         ]);
     }
 

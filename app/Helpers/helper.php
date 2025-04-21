@@ -52,7 +52,7 @@ function getYoutubeVideoId($youtubeUrl)
 
 function lang(): string
 {
-    return App()->getLocale();
+    return app()->getLocale();
 }
 
 function generateRandomCode(): int

@@ -4,6 +4,7 @@ import HeadingSmall from '@/components/heading-small';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
+import React from 'react';
 
 interface PostsLayoutProps {
     auth: any;
@@ -16,14 +17,14 @@ interface PostsLayoutProps {
 }
 
 export default function PostsLayout({
-    auth,
-    posts = [],
-    breadcrumbs,
-    title,
-    description,
-    showBackButton = false,
-    children
-}: PostsLayoutProps) {
+                                        auth,
+                                        posts = [],
+                                        breadcrumbs,
+                                        title,
+                                        description,
+                                        showBackButton = false,
+                                        children
+                                    }: PostsLayoutProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs} auth={auth}>
             <Head title={title} />
