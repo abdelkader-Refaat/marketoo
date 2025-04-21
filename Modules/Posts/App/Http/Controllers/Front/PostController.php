@@ -3,17 +3,17 @@
 namespace Modules\Posts\App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use Inertia\Inertia;
 use Modules\Posts\App\Http\Requests\StorePostRequest;
 use Modules\Posts\App\Http\Requests\UpdatePostRequest;
 use Modules\Posts\App\Models\Post;
-use Inertia\Inertia;
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
     public function index()
     {
         $posts = auth()->user()->posts()->latest()->get();
+
         return Inertia::render('posts/index', [
             'posts' => $posts,
         ]);
@@ -22,6 +22,7 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         auth()->user()->posts()->create($request->validated());
+
         return redirect()->route('site.posts.index')->with('success', 'Post created successfully.');
     }
 
@@ -47,36 +48,38 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post)
     {
         $post->update($request->validated());
+
         return redirect()->route('site.posts.index')->with('success', 'Post updated successfully.');
     }
 
     public function destroy(Post $post)
     {
         $post->delete();
+
         return redirect()->route('site.posts.index')->with('success', 'Post deleted successfully.');
     }
 
     public function events()
     {
-        $posts = auth()->user()->posts()->whereNotNull('event_name')->latest()->get();
         return Inertia::render('posts/events', [
-            'posts' => $posts,
+            'posts' => auth()->user()->posts()
+                ->whereNotNull('event_name')->latest()->get(),
         ]);
     }
 
     public function promoted()
     {
-        $posts = auth()->user()->posts()->where('is_promoted', true)->latest()->get();
         return Inertia::render('posts/promoted', [
-            'posts' => $posts,
+            'posts' => auth()->user()->posts()
+                ->where('is_promoted', true)->latest()->get(),
         ]);
     }
 
     public function archived()
     {
-        $posts = auth()->user()->posts()->where('is_archived', true)->latest()->get();
         return Inertia::render('posts/archived', [
-            'posts' => $posts,
+            'posts' => auth()->user()->posts()
+                ->where('is_archived', true)->latest()->get(),
         ]);
     }
 

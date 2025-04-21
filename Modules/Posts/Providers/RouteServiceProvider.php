@@ -2,8 +2,8 @@
 
 namespace Modules\Posts\Providers;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -26,20 +26,20 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('api')
             ->prefix('api/v1')
             ->name('api.')
-            ->group(module_path($this->name, 'routes/api_v1.php'));
+            ->group(module_path($this->name, '/Routes/api_v1.php'));
     }
 
     protected function mapWebRoutes(): void
     {
-        Route::middleware('web')->group(module_path($this->name, 'routes/web.php'));
+        Route::middleware('web')
+            ->group(module_path($this->name, '/Routes/web.php'));
     }
 
     protected function mapSiteRoutes(): void
     {
-        Route::middleware('web')->group(function () {
-            Route::prefix('site')
-                ->name('site.')
-                ->group(module_path($this->name, 'routes/front/site.php')); // Updated to load from the module
-        });
+        Route::middleware(['web', 'auth'])
+            ->prefix('site')
+            ->name('site.')
+            ->group(module_path($this->name, '/Routes/front/site.php'));
     }
 }

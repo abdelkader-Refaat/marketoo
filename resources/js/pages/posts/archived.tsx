@@ -1,9 +1,6 @@
-import { Head } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import HeadingSmall from '@/components/heading-small';
-import AppLayout from '@/layouts/app-layout';
+import PostsLayout from '@/layouts/posts-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import PostCard from '@/components/post-card';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Posts', href: '/site/posts' },
@@ -11,34 +8,32 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Archived({ auth, posts = [] }: { auth: any; posts: any[] }) {
+    const handleDelete = (postId: number) => {
+        if (confirm('Are you sure you want to delete this post?')) {
+            router.delete(route('site.posts.destroy', postId));
+        }
+    };
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Archived Posts" />
-            <div className="flex-1 p-6 lg:p-8">
-                <div className="max-w-4xl mx-auto space-y-6">
-                    <HeadingSmall title="Archived Posts" description="View your archived posts." />
-
-                    <div className="flex justify-end">
-                        <Button asChild variant="outline">
-                            <Link href={route('site.posts.index')}>Back to Posts</Link>
-                        </Button>
-                    </div>
-
-                    {posts.length === 0 ? (
-                        <div className="rounded-md border border-dashed p-8 text-center">
-                            <p className="text-sm text-muted-foreground">No archived posts found.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {posts.map((post) => (
-                                <div key={post.id} className="rounded-lg border p-4">
-                                    <h3 className="font-medium">{post.title}</h3>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+        <PostsLayout
+            auth={auth}
+            posts={posts}
+            breadcrumbs={breadcrumbs}
+            title="Archived Posts"
+            description="View your archived posts"
+            showBackButton
+        >
+            {posts.length === 0 ? (
+                <div className="p-8 text-center border border-dashed rounded-md">
+                    <p className="text-sm text-muted-foreground">No archived posts found.</p>
                 </div>
-            </div>
-        </AppLayout>
+            ) : (
+                <div className="space-y-4">
+                    {posts.map((post) => (
+                        <PostCard key={post.id} post={post} onDelete={handleDelete} />
+                    ))}
+                </div>
+            )}
+        </PostsLayout>
     );
 }
