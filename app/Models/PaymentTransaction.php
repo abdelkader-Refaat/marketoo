@@ -53,7 +53,7 @@ class PaymentTransaction extends BaseModel
      */
     public function scopePending($query)
     {
-        return $query->where('status', PayStatusEnum::PENDING->value);
+        return $query->whereStatus(PayStatusEnum::PENDING->value);
     }
 
     /**
