@@ -10,10 +10,11 @@ namespace App\Enums;
  * @method static array toArray()
  * @method static array forApi()
  * @method static string slug(int $value)
-*/
-class WalletTransactionEnum extends Base
+ */
+class
+WalletTransactionEnum extends Base
 {
-    public const CHARGE     = 0;
-    public const DEBT       = 1;
-    public const PAY_ORDER   = 2;
+    public const int CHARGE = 0;
+    public const int DEBT = 1;
+    public const int PAY_ORDER = 2;
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace App\Helpers;
 
 use Prophecy\Exception\Doubler\MethodNotFoundException;
 
@@ -8,7 +8,7 @@ use Prophecy\Exception\Doubler\MethodNotFoundException;
  * Class Base
  * @package App\Enums
  */
-abstract class Base
+abstract class BaseEnumHelper
 {
     public $reflection;
 
