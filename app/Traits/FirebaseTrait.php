@@ -2,27 +2,27 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
-trait  FirebaseTrait
+trait FirebaseTrait
 {
     use NotificationMessageTrait;
 
     public function sendFcmNotification($tokens, $data = [], $lang = 'ar')
     {
-       return false;
-        $apiurl = 'https://fcm.googleapis.com/v1/projects/' . config('app.project_id') . '/messages:send';   //replace "your-project-id" with...your project ID
+        //       return false;
+        $apiurl = 'https://fcm.googleapis.com/v1/projects/'.config('app.project_id').'/messages:send';   // replace "your-project-id" with...your project ID
 
         $headers = [
-            'Authorization: Bearer ' . $this->getToken(),
-            'Content-Type: application/json'
+            'Authorization: Bearer '.$this->getToken(),
+            'Content-Type: application/json',
         ];
 
         // you can modify this based on your needs
         $notification = [];
 
-        if (isset($data['body_' . $lang]) && !empty($data['body_' . $lang])) {
+        if (isset($data['body_'.$lang]) && ! empty($data['body_'.$lang])) {
             $notification = [
                 'title' => $this->getTitle($data['type'], $lang),
                 'body' => $this->getBody($data, $lang),
@@ -32,8 +32,80 @@ trait  FirebaseTrait
         $preparedData = $this->prepareData($data);
         $iosTokens = clone $tokens;
 
-        $this->sendAndroidFcmNotifications($tokens->where(['device_type' => 'android'])->get()->pluck('device_id')->toArray(), $preparedData, $apiurl, $headers, $notification);
-        $this->sendIosFcmNotifications($iosTokens->where(['device_type' => 'ios'])->get()->pluck('device_id')->toArray(), $preparedData, $apiurl, $headers, $notification);
+        $this->sendAndroidFcmNotifications($tokens->where(['device_type' => 'android'])->get()->pluck('device_id')->toArray(),
+            $preparedData, $apiurl, $headers, $notification);
+        $this->sendIosFcmNotifications($iosTokens->where(['device_type' => 'ios'])->get()->pluck('device_id')->toArray(),
+            $preparedData, $apiurl, $headers, $notification);
+    }
+
+    private function getToken()
+    {
+        // Read private key from service account details
+        $secret = openssl_get_privatekey(config('app.private_key'));
+
+        // $secret = openssl_get_privatekey(env('PRIVATE_KEY'));
+
+        // Create the token header
+        $header = json_encode([
+            'typ' => 'JWT',
+            'alg' => 'RS256',
+        ]);
+
+        // Get seconds since 1 January 1970
+        $time = time();
+
+        $payload = json_encode([
+            'iss' => config('app.client_email'),
+            'scope' => 'https://www.googleapis.com/auth/firebase.messaging',
+            'aud' => 'https://oauth2.googleapis.com/token',
+            'exp' => $time + 3600,
+            'iat' => $time,
+        ]);
+
+        // Encode Header
+        $base64UrlHeader = $this->base64UrlEncode($header);
+
+        // Encode Payload
+        $base64UrlPayload = $this->base64UrlEncode($payload);
+
+        // Create Signature Hash
+        $result = openssl_sign($base64UrlHeader.'.'.$base64UrlPayload, $signature, $secret, OPENSSL_ALGO_SHA256);
+
+        // Encode Signature to Base64Url String
+        $base64UrlSignature = $this->base64UrlEncode($signature);
+
+        // Create JWT
+        $jwt = $base64UrlHeader.'.'.$base64UrlPayload.'.'.$base64UrlSignature;
+
+        // -----Request token------
+        $client = new Client;
+
+        $response = $client->post('https://oauth2.googleapis.com/token', [
+            'form_params' => [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion' => $jwt,
+            ],
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ],
+        ]);
+
+        $responseBody = json_decode($response->getBody());
+
+        if (! isset($responseBody->access_token)) {
+            throw new \Exception('Failed to get access token: '.json_encode($responseBody));
+        }
+
+        return $responseBody->access_token;
+    }
+
+    private function base64UrlEncode($text)
+    {
+        return str_replace(
+            ['+', '/', '='],
+            ['-', '_', ''],
+            base64_encode($text)
+        );
     }
 
     private function prepareData($data)
@@ -41,12 +113,17 @@ trait  FirebaseTrait
         foreach ($data as $key => $value) {
             if (is_int($value)) {
                 $data[$key] = strval($value);
-            } else if (is_bool($value)) {
-                $data[$key] = strval($value);
-            } else if (is_array($value)) {
-                $data[$key] = json_encode($value);
+            } else {
+                if (is_bool($value)) {
+                    $data[$key] = strval($value);
+                } else {
+                    if (is_array($value)) {
+                        $data[$key] = json_encode($value);
+                    }
+                }
             }
         }
+
         return $data;
     }
 
@@ -64,9 +141,9 @@ trait  FirebaseTrait
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
             $result = curl_exec($ch);
-            if ($result === FALSE) {
-                //Failed
-                die('Curl failed: ' . curl_error($ch));
+            if ($result === false) {
+                // Failed
+                exit('Curl failed: '.curl_error($ch));
             }
 
             curl_close($ch);
@@ -79,21 +156,22 @@ trait  FirebaseTrait
     {
         $lang = $data['lang'] ?? 'ar';
         $result = [];
-        if (isset($data['body_' . $lang]) && !empty($data['body_' . $lang])) {
+        if (isset($data['body_'.$lang]) && ! empty($data['body_'.$lang])) {
             $result = [
                 'title' => $this->getTitle($data['type'], $lang),
                 'message' => $this->getBody($data, $lang),
                 'type' => $data['type'],
-                'order_id' => isset($data['order_id'])? $data['order_id'] : null
+                'order_id' => isset($data['order_id']) ? $data['order_id'] : null,
             ];
         } else {
             $result = [
                 'title' => $this->getTitle($data['type'], $lang),
                 'message' => $this->getBody($data, $lang),
                 'type' => $data['type'],
-                'order_id' => isset($data['order_id'])? $data['order_id'] : null
+                'order_id' => isset($data['order_id']) ? $data['order_id'] : null,
             ];
         }
+
         return [
             'message' => [
                 'token' => $token,
@@ -116,14 +194,13 @@ trait  FirebaseTrait
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
             $result = curl_exec($ch);
-            if ($result === FALSE) {
-                //Failed
-                die('Curl failed: ' . curl_error($ch));
+            if ($result === false) {
+                // Failed
+                exit('Curl failed: '.curl_error($ch));
             }
 
             curl_close($ch);
         }
-
     }
 
     private function getIosMessageFormat($token, $data, $notification)
@@ -134,7 +211,7 @@ trait  FirebaseTrait
                 'notification' => $notification,
                 'data' => $data,
                 'apns' => [
-//                    'mutable-content'=> 1,
+                    //                    'mutable-content'=> 1,
                     'headers' => [
                         'apns-priority' => '10', // High priority for immediate delivery
                         'apns-push-type' => 'alert', // For alert notifications
@@ -149,77 +226,5 @@ trait  FirebaseTrait
                 // 'sound'             => 'default',
             ],
         ];
-    }
-
-
-    private function getToken()
-    {
-
-        // Read private key from service account details
-        $secret = openssl_get_privatekey(config('app.private_key'));
-
-        // $secret = openssl_get_privatekey(env('PRIVATE_KEY'));
-
-        // Create the token header
-        $header = json_encode([
-            'typ' => 'JWT',
-            'alg' => 'RS256'
-        ]);
-
-        // Get seconds since 1 January 1970
-        $time = time();
-
-        $payload = json_encode([
-            "iss" => config('app.client_email'),
-            "scope" => "https://www.googleapis.com/auth/firebase.messaging",
-            "aud" => "https://oauth2.googleapis.com/token",
-            "exp" => $time + 3600,
-            "iat" => $time
-        ]);
-
-        // Encode Header
-        $base64UrlHeader = $this->base64UrlEncode($header);
-
-        // Encode Payload
-        $base64UrlPayload = $this->base64UrlEncode($payload);
-
-        // Create Signature Hash
-        $result = openssl_sign($base64UrlHeader . "." . $base64UrlPayload, $signature, $secret, OPENSSL_ALGO_SHA256);
-
-        // Encode Signature to Base64Url String
-        $base64UrlSignature = $this->base64UrlEncode($signature);
-
-        // Create JWT
-        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
-
-        //-----Request token------
-        $client = new Client();
-
-        $response = $client->post('https://oauth2.googleapis.com/token', [
-            'form_params' => [
-                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion' => $jwt
-            ],
-            'headers' => [
-                'Content-Type' => 'application/x-www-form-urlencoded'
-            ]
-        ]);
-
-        $responseBody = json_decode($response->getBody());
-
-        if (!isset($responseBody->access_token)) {
-            throw new \Exception("Failed to get access token: " . json_encode($responseBody));
-        }
-
-        return $responseBody->access_token;
-    }
-
-    private function base64UrlEncode($text)
-    {
-        return str_replace(
-            ['+', '/', '='],
-            ['-', '_', ''],
-            base64_encode($text)
-        );
     }
 }

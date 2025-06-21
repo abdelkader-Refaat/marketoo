@@ -46,14 +46,25 @@ class AppServiceProvider extends ServiceProvider
         );
 
         try {
-            $this->settings = Cache::rememberForever('settings', function () {
-                return SettingService::appInformations(SiteSetting::pluck('value', 'key'));
-            });
-            $this->socials = Cache::rememberForever('socials', function () {
-                return Social::get();
-            });
+            if (Schema::hasTable('site_settings')) {
+                $this->settings = Cache::rememberForever('settings', function () {
+                    return SettingService::appInformations(SiteSetting::pluck('value', 'key'));
+                });
+            } else {
+                $this->settings = [];
+            }
+
+            if (Schema::hasTable('socials')) {
+                $this->socials = Cache::rememberForever('socials', function () {
+                    return Social::get();
+                });
+            } else {
+                $this->socials = [];
+            }
         } catch (Exception $e) {
             echo 'app service provider exception :::::::::: '.$e->getMessage();
+            $this->settings = [];
+            $this->socials = [];
         }
 
         view()->composer('admin.*', function ($view) {
