@@ -27,7 +27,7 @@ class RegisterResource extends JsonResource
             //            'category' => $this->category?->name ?? "",
             'country' => $this->country?->name,
             'city' => $this->city?->name,
-            'is_active' => (bool) $this->active,
+            'is_active' => (bool) $this->is_active,
             'is_blocked' => (bool) $this->is_blocked,
 //            'is_approved' => (bool) $this->is_approved,
             'type' => strtolower(UserTypesEnum::tryFrom($this->type)?->name),
